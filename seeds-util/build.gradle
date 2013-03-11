@@ -1,0 +1,4 @@
+dependencies {
+	compile project(':seeds-collect')
+	compile 'javax.inject:javax.inject:1'
+}

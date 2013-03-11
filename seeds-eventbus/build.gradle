@@ -1,0 +1,4 @@
+dependencies {
+	compile project(':seeds-cache')
+	compile project(':seeds-reflect')
+}

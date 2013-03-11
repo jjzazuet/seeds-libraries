@@ -1,0 +1,46 @@
+subprojects {
+
+	apply plugin: 'java'
+	apply plugin: 'osgi'
+	apply plugin: 'eclipse'
+	apply plugin: 'maven-publish'
+
+	group = 'com.google.seeds'
+	version = '14.0'
+	sourceCompatibility = 1.6
+
+	repositories { mavenCentral() }
+	configurations { provided }
+
+	sourceSets {
+		main.compileClasspath += configurations.provided
+		test.compileClasspath += configurations.provided
+		test.runtimeClasspath += configurations.provided
+	}
+	
+	dependencies {
+		compile 'com.google.code.findbugs:jsr305:2.0.1'
+	}
+
+	eclipse {
+		classpath {
+			plusConfigurations += configurations.provided
+			noExportConfigurations += configurations.provided
+		}
+	}
+
+	task sourcesJar(type: Jar, dependsOn:classes) {
+		classifier = 'sources'
+		from sourceSets.main.allSource
+	}
+
+	task javadocJar(type: Jar, dependsOn:javadoc) {
+		classifier = 'javadoc'
+		from javadoc.destinationDir
+	}
+
+	artifacts {
+		archives sourcesJar
+		archives javadocJar
+	}
+}

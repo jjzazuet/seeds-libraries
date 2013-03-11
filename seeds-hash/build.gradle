@@ -1,0 +1,7 @@
+dependencies {
+	compile project(':seeds-functional')
+	
+	// TODO Only BloomFilterStrategies uses LongMath::divide()
+	// replacable by seeds-primitives
+	compile project(':seeds-math') 
+}

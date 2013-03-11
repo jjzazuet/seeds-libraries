@@ -1,0 +1,6 @@
+dependencies {
+	compile project(':seeds-base')
+	// TODO Only DoubleMath::fuzzyCompare() depends on seeds-primitives
+	// is that really necessary?
+	compile project(':seeds-primitives') 
+}

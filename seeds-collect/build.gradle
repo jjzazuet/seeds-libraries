@@ -1,0 +1,4 @@
+dependencies {
+	compile project(':seeds-functional')
+	compile project(':seeds-math')
+}

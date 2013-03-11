@@ -1,0 +1,14 @@
+rootProject.name = 'seeds-libraries'
+
+include 'seeds-base', 
+	'seeds-functional', 
+	'seeds-primitives',
+	'seeds-math',
+	'seeds-reflect',
+	'seeds-util',
+	'seeds-collect',
+	'seeds-cache',
+	'seeds-hash',
+	'seeds-eventbus',
+	'seeds-io',
+	'seeds-net'

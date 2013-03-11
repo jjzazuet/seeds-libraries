@@ -1,0 +1,4 @@
+dependencies {
+	compile project(':seeds-hash')
+	compile project(':seeds-collect')
+}
