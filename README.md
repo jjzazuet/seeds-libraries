@@ -13,7 +13,7 @@ Use [Gradle 1.4](http://gradle.org "Gradle 1.4") to compile the source code.
 
 Upload to your local Maven repository.
 
-    gradle maven-publish
+    gradle publishToMavenLocal
 
 The following artifacts will be available:
 
@@ -30,7 +30,7 @@ The following artifacts will be available:
     seeds-reflect
     seeds-util
 
-Use an artifacts like so:
+Use an artifact like so:
 
     <dependency>
         <groupId>com.google.seeds</groupId>
