@@ -3,7 +3,7 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'osgi'
 	apply plugin: 'eclipse'
-	apply plugin: 'maven-publish'
+	apply plugin: 'maven'
 
 	group = 'com.google.seeds'
 	version = '14.0'
@@ -42,5 +42,11 @@ subprojects {
 	artifacts {
 		archives sourcesJar
 		archives javadocJar
+	}
+	
+	tasks.withType(Zip) { 
+		task -> task.doLast {
+			ant.checksum file: it.archivePath
+		}
 	}
 }
