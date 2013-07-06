@@ -7,13 +7,13 @@ Atomic jars for [guava-libraries 14.0](https://code.google.com/p/guava-libraries
 
 No source files/package names were altered, just reshuffled into atomic `jar` files corresponding to each major library component.
 
-Use [Gradle 1.4](http://gradle.org "Gradle 1.4") to compile the source code.
+Use [Gradle 1.6](http://gradle.org "Gradle 1.6") to compile the source code.
 
     gradle clean assemble
 
 Upload to your local Maven repository.
 
-    gradle publishToMavenLocal
+    gradle install
 
 The following artifacts will be available:
 
