@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Seeds-libraries by jjzazuet</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Seeds-libraries</h1>
+        <p>Atomic jars for guava-libraries</p>
+
+        <p class="view"><a href="https://github.com/jjzazuet/seeds-libraries">View the Project on GitHub <small>jjzazuet/seeds-libraries</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/jjzazuet/seeds-libraries/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/jjzazuet/seeds-libraries/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/jjzazuet/seeds-libraries">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="seeds-libraries" class="anchor" href="#seeds-libraries"><span class="octicon octicon-link"></span></a>seeds-libraries</h1>
+
+<blockquote>
+<p><em>Not the whole guava ;)</em></p>
+</blockquote>
+
+<p>Atomic jars for <a href="https://code.google.com/p/guava-libraries/wiki/Release14">guava-libraries 14.0</a>. </p>
+
+<blockquote>
+<p>DISCLAIMER: No source files/package names were altered, just reshuffled into atomic <code>jar</code> files corresponding to each major library component. Also, no fruits were harmed in the making of these libraries ;).</p>
+</blockquote>
+
+<h2>
+<a name="why-fork-from-guava" class="anchor" href="#why-fork-from-guava"><span class="octicon octicon-link"></span></a>Why fork from Guava?</h2>
+
+<p>As discussed in issue <a href="https://code.google.com/p/guava-libraries/issues/detail?id=605">Guava Issue 605</a>, there are a lot of classes that in some cases, library and framework authors may not want to include with their binary product.</p>
+
+<p>While it is also true that such authors may want to use tools such as <a href="http://proguard.sourceforge.net/">Proguard</a> to minimize the size of their binary bundle, it implicitly requires another build time step in their process and also makes it more difficult to trace the cause of a bug back to its original source code during a debug session.</p>
+
+<p>In the end, I believe this is only a matter of preference. And my preference is to use only what I need to. Not more, not less. </p>
+
+<p>The <code>seeds-libraries</code> project is an attempt to build and publish atomic versions of the Guava Libraries which are too valuable to leave out of any modern development project.</p>
+
+<h2>
+<a name="warning" class="anchor" href="#warning"><span class="octicon octicon-link"></span></a>Warning</h2>
+
+<p>As discussed in <a href="https://code.google.com/p/guava-libraries/issues/detail?id=605">Guava Issue 605</a>, mixing the seeds libraries with the original Guava libraries may lead to unexpected classpath/runtime errors. I have personally seen this in personal projects where for example, Gradle's DSLD support silently introduces a copy of the Guava libraries version 11 in the classpath of a project.</p>
+
+<p>You have to be careful and aware of which set of classes will be used in your project (Guava's or seeds'). </p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Use <a href="http://gradle.org" title="Gradle 1.6">Gradle 1.6</a> to compile the source code.</p>
+
+<pre><code>gradle clean assemble
+</code></pre>
+
+<p>Upload to your local Maven repository.</p>
+
+<pre><code>gradle install
+</code></pre>
+
+<p>The following artifacts will be available:</p>
+
+<pre><code>seeds-base
+seeds-cache
+seeds-collect
+seeds-eventbus
+seeds-functional
+seeds-hash
+seeds-io
+seeds-math
+seeds-net
+seeds-primitives
+seeds-reflect
+seeds-util
+</code></pre>
+
+<p>Use an artifact like so:</p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;com.google.seeds&lt;/groupId&gt;
+    &lt;artifactId&gt;seeds-eventbus&lt;/artifactId&gt;
+    &lt;version&gt;14.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>Enjoy.</p>
+
+<h3>
+<a name="things-to-do" class="anchor" href="#things-to-do"><span class="octicon octicon-link"></span></a>Things to do.</h3>
+
+<p>With any luck, these could make it into Maven Central. If that's the case, here are some things left to do:</p>
+
+<ul>
+<li>Port the unit tests.</li>
+<li>Decouple some subcomponents which have only <em>one</em> class calling a method in another library component.</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/jjzazuet">jjzazuet</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
