@@ -4,9 +4,10 @@ subprojects {
 	apply plugin: 'osgi'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven'
+	apply plugin: 'signing'
 
-	group = 'com.google.seeds'
-	version = '14.0'
+	group = 'net.tribe7.seeds'
+	version = '14.0.1'
 	sourceCompatibility = 1.6
 
 	repositories { mavenCentral() }
@@ -17,7 +18,7 @@ subprojects {
 		test.compileClasspath += configurations.provided
 		test.runtimeClasspath += configurations.provided
 	}
-	
+
 	dependencies {
 		compile 'com.google.code.findbugs:jsr305:2.0.1'
 	}
@@ -40,10 +41,15 @@ subprojects {
 	}
 
 	artifacts {
+		archives jar
 		archives sourcesJar
 		archives javadocJar
 	}
-	
+
+	signing {
+		sign configurations.archives
+	}
+
 	tasks.withType(Zip) { 
 		task -> task.doLast {
 			ant.checksum file: it.archivePath
