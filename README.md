@@ -3,7 +3,7 @@ seeds-libraries
 
 > *Not the whole guava ;)*
 
-Atomic jars for [guava-libraries 14.0](https://code.google.com/p/guava-libraries/wiki/Release14). 
+Atomic jars for [guava-libraries 14.0.1](https://code.google.com/p/guava-libraries/wiki/Release14). 
 
 > DISCLAIMER: No source files/package names were altered, just reshuffled into atomic `jar` files corresponding to each major library component. Also, no fruits were harmed in the making of these libraries ;).
 
@@ -21,7 +21,7 @@ The `seeds-libraries` project is an attempt to build and publish atomic versions
 
 As discussed in [Guava Issue 605](https://code.google.com/p/guava-libraries/issues/detail?id=605), mixing the seeds libraries with the original Guava libraries may lead to unexpected classpath/runtime errors. I have personally seen this in personal projects where for example, Gradle's DSLD support silently introduces a copy of the Guava libraries version 11 in the classpath of a project.
 
-You have to be careful and aware of which set of classes will be used in your project (Guava's or seeds'). 
+Therefore, I have decided to introduce an intentional package break and leave all the classes under the main package `net.tribe7` in order to minimize the amount of classpath conflicts. You have to be careful and aware of which set of classes will be used in your project (Guava's or seeds').
 
 ## Usage
 
@@ -51,16 +51,15 @@ The following artifacts will be available:
 Use an artifact like so:
 
     <dependency>
-        <groupId>com.google.seeds</groupId>
+        <groupId>net.tribe7.seeds</groupId>
         <artifactId>seeds-eventbus</artifactId>
-        <version>14.0</version>
+        <version>14.0.1</version>
     </dependency>
 
 Enjoy.
 
-###Things to do.
+## Things to do.
 
 With any luck, these could make it into Maven Central. If that's the case, here are some things left to do:
 
-- Port the unit tests.
 - Decouple some subcomponents which have only *one* class calling a method in another library component.
