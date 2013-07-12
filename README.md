@@ -5,7 +5,7 @@ seeds-libraries
 
 Atomic jars for [guava-libraries 14.0.1](https://code.google.com/p/guava-libraries/wiki/Release14). 
 
-> DISCLAIMER: No source files/package names were altered, just reshuffled into atomic `jar` files corresponding to each major library component. Also, no fruits were harmed in the making of these libraries ;).
+> DISCLAIMER: With the exception of package naming, no source files were altered, just reshuffled into atomic source trees corresponding to each major library component. Also, no fruits were harmed in the making of these libraries ;).
 
 ## Why fork from Guava?
 
