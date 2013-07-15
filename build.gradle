@@ -2,13 +2,15 @@ subprojects {
 
 	apply plugin: 'java'
 	apply plugin: 'osgi'
-	apply plugin: 'eclipse'
 	apply plugin: 'maven'
 	apply plugin: 'signing'
+	apply plugin: 'eclipse'
 
 	group = 'net.tribe7.seeds'
 	version = '14.0.1'
 	sourceCompatibility = 1.6
+
+	def releaseBuild = true
 
 	repositories { mavenCentral() }
 	configurations { provided }
@@ -20,7 +22,7 @@ subprojects {
 	}
 
 	dependencies {
-		compile 'com.google.code.findbugs:jsr305:2.0.1'
+		provided 'com.google.code.findbugs:jsr305:2.0.1'
 	}
 
 	eclipse {
@@ -28,6 +30,12 @@ subprojects {
 			plusConfigurations += configurations.provided
 			noExportConfigurations += configurations.provided
 		}
+	}
+
+	jar { manifest.attributes provider: 'tribe7.net' }
+
+	javadoc {
+		classpath += configurations.provided
 	}
 
 	task sourcesJar(type: Jar, dependsOn:classes) {
@@ -53,6 +61,44 @@ subprojects {
 	tasks.withType(Zip) { 
 		task -> task.doLast {
 			ant.checksum file: it.archivePath
+		}
+	}
+
+	uploadArchives {
+		repositories {
+			if (!releaseBuild) { mavenLocal() }
+			else {
+				mavenDeployer {
+					beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+					repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+					  authentication(userName: sonatypeUsername, password: sonatypePassword)
+					}
+					pom.project {
+						name project.name
+						packaging 'jar'
+						description 'Atomic jars for Google Guava libraries'
+						url 'http://seeds.tribe7.net/'
+						scm {
+							url 'scm:git@github.com:jjzazuet/seeds-libraries.git'
+							connection 'scm:git@github.com:jjzazuet/seeds-libraries.git'
+							developerConnection 'scm:git@github.com:jjzazuet/seeds-libraries.git'
+						}
+						licenses {
+							license {
+								name 'The Apache Software License, Version 2.0'
+								url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+								distribution 'repo'
+							}
+						}
+						developers {
+							developer {
+								id 'jjzazuet'
+								name 'Jesus Zazueta'
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
