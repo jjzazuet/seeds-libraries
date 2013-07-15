@@ -25,15 +25,15 @@ Therefore, I have decided to introduce an intentional package break and leave al
 
 ## Usage
 
-Use [Gradle 1.6](http://gradle.org "Gradle 1.6") to compile the source code.
+Release 14.0.1 is now on Maven Central. Use an artifact like so:
 
-    gradle clean assemble
+    <dependency>
+        <groupId>net.tribe7.seeds</groupId>
+        <artifactId>seeds-eventbus</artifactId>
+        <version>14.0.1</version>
+    </dependency>
 
-Upload to your local Maven repository.
-
-    gradle install
-
-The following artifacts will be available:
+The following artifacts are available.
 
     seeds-base
     seeds-cache
@@ -48,18 +48,14 @@ The following artifacts will be available:
     seeds-reflect
     seeds-util
 
-Use an artifact like so:
+## Compiling from source.
 
-    <dependency>
-        <groupId>net.tribe7.seeds</groupId>
-        <artifactId>seeds-eventbus</artifactId>
-        <version>14.0.1</version>
-    </dependency>
+Use [Gradle 1.6](http://gradle.org "Gradle 1.6") to compile the source code.
+
+    gradle clean assemble
+
+You can then upload the artifacts to your local Maven repository.
+
+    gradle install
 
 Enjoy.
-
-## Things to do.
-
-With any luck, these could make it into Maven Central. If that's the case, here are some things left to do:
-
-- Decouple some subcomponents which have only *one* class calling a method in another library component.
