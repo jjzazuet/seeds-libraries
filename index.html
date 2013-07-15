@@ -1,33 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Seeds-libraries by jjzazuet</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Seeds-libraries : Atomic jars for guava-libraries" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Seeds-libraries</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Seeds-libraries</h1>
-        <p>Atomic jars for guava-libraries</p>
 
-        <p class="view"><a href="https://github.com/jjzazuet/seeds-libraries">View the Project on GitHub <small>jjzazuet/seeds-libraries</small></a></p>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jjzazuet/seeds-libraries">View on GitHub</a>
 
+          <h1 id="project_title">Seeds-libraries</h1>
+          <h2 id="project_tagline">Atomic jars for guava-libraries</h2>
 
-        <ul>
-          <li><a href="https://github.com/jjzazuet/seeds-libraries/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/jjzazuet/seeds-libraries/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/jjzazuet/seeds-libraries">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/jjzazuet/seeds-libraries/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/jjzazuet/seeds-libraries/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h1>
 <a name="seeds-libraries" class="anchor" href="#seeds-libraries"><span class="octicon octicon-link"></span></a>seeds-libraries</h1>
 
@@ -62,17 +65,16 @@
 <h2>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>Use <a href="http://gradle.org" title="Gradle 1.6">Gradle 1.6</a> to compile the source code.</p>
+<p>Release 14.0.1 is now on Maven Central. Use an artifact like so:</p>
 
-<pre><code>gradle clean assemble
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;net.tribe7.seeds&lt;/groupId&gt;
+    &lt;artifactId&gt;seeds-eventbus&lt;/artifactId&gt;
+    &lt;version&gt;14.0.1&lt;/version&gt;
+&lt;/dependency&gt;
 </code></pre>
 
-<p>Upload to your local Maven repository.</p>
-
-<pre><code>gradle install
-</code></pre>
-
-<p>The following artifacts will be available:</p>
+<p>The following artifacts are available.</p>
 
 <pre><code>seeds-base
 seeds-cache
@@ -88,32 +90,31 @@ seeds-reflect
 seeds-util
 </code></pre>
 
-<p>Use an artifact like so:</p>
+<h2>
+<a name="compiling-from-source" class="anchor" href="#compiling-from-source"><span class="octicon octicon-link"></span></a>Compiling from source.</h2>
 
-<pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;net.tribe7.seeds&lt;/groupId&gt;
-    &lt;artifactId&gt;seeds-eventbus&lt;/artifactId&gt;
-    &lt;version&gt;14.0.1&lt;/version&gt;
-&lt;/dependency&gt;
+<p>Use <a href="http://gradle.org" title="Gradle 1.6">Gradle 1.6</a> to compile the source code.</p>
+
+<pre><code>gradle clean assemble
+</code></pre>
+
+<p>You can then upload the artifacts to your local Maven repository.</p>
+
+<pre><code>gradle install
 </code></pre>
 
 <p>Enjoy.</p>
-
-<h2>
-<a name="things-to-do" class="anchor" href="#things-to-do"><span class="octicon octicon-link"></span></a>Things to do.</h2>
-
-<p>With any luck, these could make it into Maven Central. If that's the case, here are some things left to do:</p>
-
-<ul>
-<li>Decouple some subcomponents which have only <em>one</em> class calling a method in another library component.</li>
-</ul>
       </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/jjzazuet">jjzazuet</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Seeds-libraries maintained by <a href="https://github.com/jjzazuet">jjzazuet</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
+
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -124,6 +125,7 @@ seeds-util
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
+
 
   </body>
 </html>
