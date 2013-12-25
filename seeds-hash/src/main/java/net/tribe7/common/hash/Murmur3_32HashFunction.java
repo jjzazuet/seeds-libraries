@@ -27,12 +27,14 @@ package net.tribe7.common.hash;
 
 import static net.tribe7.common.primitives.UnsignedBytes.toInt;
 
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+
+import javax.annotation.Nullable;
+
 import net.tribe7.common.primitives.Chars;
 import net.tribe7.common.primitives.Ints;
 import net.tribe7.common.primitives.Longs;
-
-import java.io.Serializable;
-import java.nio.ByteBuffer;
 
 /**
  * See http://smhasher.googlecode.com/svn/trunk/MurmurHash3.cpp
@@ -63,6 +65,20 @@ final class Murmur3_32HashFunction extends AbstractStreamingHashFunction impleme
   @Override
   public String toString() {
     return "Hashing.murmur3_32(" + seed + ")";
+  }
+
+  @Override
+  public boolean equals(@Nullable Object object) {
+    if (object instanceof Murmur3_32HashFunction) {
+      Murmur3_32HashFunction other = (Murmur3_32HashFunction) object;
+      return seed == other.seed;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode() ^ seed;
   }
 
   @Override public HashCode hashInt(int input) {
@@ -128,7 +144,7 @@ final class Murmur3_32HashFunction extends AbstractStreamingHashFunction impleme
     h1 ^= h1 >>> 13;
     h1 *= 0xc2b2ae35;
     h1 ^= h1 >>> 16;
-    return HashCodes.fromInt(h1);
+    return HashCode.fromInt(h1);
   }
 
   private static final class Murmur3_32Hasher extends AbstractStreamingHasher {

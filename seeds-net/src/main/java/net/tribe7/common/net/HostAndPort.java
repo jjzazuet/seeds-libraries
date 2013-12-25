@@ -20,16 +20,15 @@ import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkState;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Objects;
-import net.tribe7.common.base.Strings;
-
 import java.io.Serializable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
+import net.tribe7.common.base.Strings;
 
 /**
  * An immutable representation of a host and port.
@@ -62,7 +61,9 @@ import javax.annotation.concurrent.Immutable;
  * @author Paul Marks
  * @since 10.0
  */
-@Beta @Immutable
+@Beta
+@Immutable
+@GwtCompatible
 public final class HostAndPort implements Serializable {
   /** Magic value indicating the absence of a port number. */
   private static final int NO_PORT = -1;
@@ -130,13 +131,11 @@ public final class HostAndPort implements Serializable {
    *     or {@code port} is out of range.
    */
   public static HostAndPort fromParts(String host, int port) {
-    checkArgument(isValidPort(port));
+    checkArgument(isValidPort(port), "Port out of range: %s", port);
     HostAndPort parsedHost = fromString(host);
-    checkArgument(!parsedHost.hasPort());
+    checkArgument(!parsedHost.hasPort(), "Host has a port: %s", host);
     return new HostAndPort(parsedHost.host, port, parsedHost.hasBracketlessColons);
   }
-
-  private static final Pattern BRACKET_PATTERN = Pattern.compile("^\\[(.*:.*)\\](?::(\\d*))?$");
 
   /**
    * Split a freeform string into a host and port, without strict validation.
@@ -155,11 +154,9 @@ public final class HostAndPort implements Serializable {
     boolean hasBracketlessColons = false;
 
     if (hostPortString.startsWith("[")) {
-      // Parse a bracketed host, typically an IPv6 literal.
-      Matcher matcher = BRACKET_PATTERN.matcher(hostPortString);
-      checkArgument(matcher.matches(), "Invalid bracketed host/port: %s", hostPortString);
-      host = matcher.group(1);
-      portString = matcher.group(2);  // could be null
+      String[] hostAndPort = getHostAndPortFromBracketedHost(hostPortString);
+      host = hostAndPort[0];
+      portString = hostAndPort[1];
     } else {
       int colonPos = hostPortString.indexOf(':');
       if (colonPos >= 0 && hostPortString.indexOf(':', colonPos + 1) == -1) {
@@ -187,6 +184,38 @@ public final class HostAndPort implements Serializable {
     }
 
     return new HostAndPort(host, port, hasBracketlessColons);
+  }
+
+  /**
+   * Parses a bracketed host-port string, throwing IllegalArgumentException if parsing fails.
+   *
+   * @param hostPortString the full bracketed host-port specification. Post might not be specified.
+   * @return an array with 2 strings: host and port, in that order.
+   * @throws IllegalArgumentException if parsing the bracketed host-port string fails.
+   */
+  private static String[] getHostAndPortFromBracketedHost(String hostPortString) {
+    int colonIndex = 0;
+    int closeBracketIndex = 0;
+    boolean hasPort = false;
+    checkArgument(hostPortString.charAt(0) == '[',
+        "Bracketed host-port string must start with a bracket: %s", hostPortString);
+    colonIndex = hostPortString.indexOf(':');
+    closeBracketIndex = hostPortString.lastIndexOf(']');
+    checkArgument(colonIndex > -1 && closeBracketIndex > colonIndex,
+        "Invalid bracketed host/port: %s", hostPortString);
+
+    String host = hostPortString.substring(1, closeBracketIndex);
+    if (closeBracketIndex + 1 == hostPortString.length()) {
+      return new String[] { host, "" };
+    } else {
+      checkArgument(hostPortString.charAt(closeBracketIndex + 1) == ':',
+          "Only a colon may follow a close bracket: %s", hostPortString);
+      for (int i = closeBracketIndex + 2; i < hostPortString.length(); ++i) {
+        checkArgument(Character.isDigit(hostPortString.charAt(i)),
+            "Port must be numeric: %s", hostPortString);
+      }
+      return new String[] { host, hostPortString.substring(closeBracketIndex + 2) };
+    }
   }
 
   /**

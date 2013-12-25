@@ -16,10 +16,10 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
 import java.util.Comparator;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /** An ordering that tries several comparators in order. */
 @GwtCompatible(serializable = true)

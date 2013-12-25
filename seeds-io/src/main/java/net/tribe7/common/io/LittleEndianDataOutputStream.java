@@ -16,15 +16,15 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
-import net.tribe7.common.primitives.Longs;
-
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
+import net.tribe7.common.primitives.Longs;
 
 /**
  * An implementation of {@link DataOutput} that uses little-endian byte ordering

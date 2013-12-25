@@ -16,10 +16,10 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * An iterator that supports a one-element lookahead while iterating.

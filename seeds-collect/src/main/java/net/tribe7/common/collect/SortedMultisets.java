@@ -19,10 +19,6 @@ package net.tribe7.common.collect;
 import static net.tribe7.common.collect.BoundType.CLOSED;
 import static net.tribe7.common.collect.BoundType.OPEN;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.collect.Multiset.Entry;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
@@ -30,6 +26,10 @@ import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.collect.Multiset.Entry;
 
 /**
  * Provides static utility methods for creating and working with

@@ -19,12 +19,8 @@ package net.tribe7.common.io;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.hash.Funnels;
-import net.tribe7.common.hash.HashCode;
-import net.tribe7.common.hash.HashFunction;
-import net.tribe7.common.hash.Hasher;
-
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +28,13 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Iterator;
+
+import net.tribe7.common.collect.ImmutableList;
+import net.tribe7.common.hash.Funnels;
+import net.tribe7.common.hash.HashCode;
+import net.tribe7.common.hash.HashFunction;
+import net.tribe7.common.hash.Hasher;
 
 /**
  * A readable source of bytes, such as a file. Unlike an {@link InputStream}, a
@@ -51,7 +54,7 @@ import java.util.Arrays;
  * @since 14.0
  * @author Colin Decker
  */
-public abstract class ByteSource {
+public abstract class ByteSource implements InputSupplier<InputStream> {
 
   private static final int BUF_SIZE = 0x1000; // 4K
 
@@ -74,14 +77,33 @@ public abstract class ByteSource {
   public abstract InputStream openStream() throws IOException;
 
   /**
-   * Opens a new {@link BufferedInputStream} for reading from this source. This method should return
-   * a new, independent stream each time it is called.
+   * This method is a temporary method provided for easing migration from suppliers to sources and
+   * sinks.
+   *
+   * @since 15.0
+   * @deprecated This method is only provided for temporary compatibility with the
+   *     {@link InputSupplier} interface and should not be called directly. Use {@link #openStream}
+   *     instead.
+   */
+  @Override
+  @Deprecated
+  public final InputStream getInput() throws IOException {
+    return openStream();
+  }
+
+  /**
+   * Opens a new buffered {@link InputStream} for reading from this source. The returned stream is
+   * not required to be a {@link BufferedInputStream} in order to allow implementations to simply
+   * delegate to {@link #openStream()} when the stream returned by that method does not benefit
+   * from additional buffering (for example, a {@code ByteArrayInputStream}). This method should
+   * return a new, independent stream each time it is called.
    *
    * <p>The caller is responsible for ensuring that the returned stream is closed.
    *
    * @throws IOException if an I/O error occurs in the process of opening the stream
+   * @since 15.0 (in 14.0 with return type {@link BufferedInputStream})
    */
-  public BufferedInputStream openBufferedStream() throws IOException {
+  public InputStream openBufferedStream() throws IOException {
     InputStream in = openStream();
     return (in instanceof BufferedInputStream)
         ? (BufferedInputStream) in
@@ -96,6 +118,25 @@ public abstract class ByteSource {
    */
   public ByteSource slice(long offset, long length) {
     return new SlicedByteSource(offset, length);
+  }
+
+  /**
+   * Returns whether the source has zero bytes. The default implementation is to open a stream and
+   * check for EOF.
+   *
+   * @throws IOException if an I/O error occurs
+   * @since 15.0
+   */
+  public boolean isEmpty() throws IOException {
+    Closer closer = Closer.create();
+    try {
+      InputStream in = closer.register(openStream());
+      return in.read() == -1;
+    } catch (Throwable e) {
+      throw closer.rethrow(e);
+    } finally {
+      closer.close();
+    }
   }
 
   /**
@@ -148,6 +189,10 @@ public abstract class ByteSource {
       if (skipped <= 0) {
         if (in.read() == -1) {
           return count;
+        } else if (count == 0 && in.available() == 0) {
+          // if available is still zero after reading a single byte, it
+          // will probably always be zero, so we should countByReading
+          throw new IOException();
         }
         count++;
       } else {
@@ -271,6 +316,78 @@ public abstract class ByteSource {
   }
 
   /**
+   * Concatenates multiple {@link ByteSource} instances into a single source. Streams returned from
+   * the source will contain the concatenated data from the streams of the underlying sources.
+   *
+   * <p>Only one underlying stream will be open at a time. Closing the concatenated stream will
+   * close the open underlying stream.
+   *
+   * @param sources the sources to concatenate
+   * @return a {@code ByteSource} containing the concatenated data
+   * @since 15.0
+   */
+  public static ByteSource concat(Iterable<? extends ByteSource> sources) {
+    return new ConcatenatedByteSource(sources);
+  }
+
+  /**
+   * Concatenates multiple {@link ByteSource} instances into a single source. Streams returned from
+   * the source will contain the concatenated data from the streams of the underlying sources.
+   *
+   * <p>Only one underlying stream will be open at a time. Closing the concatenated stream will
+   * close the open underlying stream.
+   *
+   * <p>Note: The input {@code Iterator} will be copied to an {@code ImmutableList} when this
+   * method is called. This will fail if the iterator is infinite and may cause problems if the
+   * iterator eagerly fetches data for each source when iterated (rather than producing sources
+   * that only load data through their streams). Prefer using the {@link #concat(Iterable)}
+   * overload if possible.
+   *
+   * @param sources the sources to concatenate
+   * @return a {@code ByteSource} containing the concatenated data
+   * @throws NullPointerException if any of {@code sources} is {@code null}
+   * @since 15.0
+   */
+  public static ByteSource concat(Iterator<? extends ByteSource> sources) {
+    return concat(ImmutableList.copyOf(sources));
+  }
+
+  /**
+   * Concatenates multiple {@link ByteSource} instances into a single source. Streams returned from
+   * the source will contain the concatenated data from the streams of the underlying sources.
+   *
+   * <p>Only one underlying stream will be open at a time. Closing the concatenated stream will
+   * close the open underlying stream.
+   *
+   * @param sources the sources to concatenate
+   * @return a {@code ByteSource} containing the concatenated data
+   * @throws NullPointerException if any of {@code sources} is {@code null}
+   * @since 15.0
+   */
+  public static ByteSource concat(ByteSource... sources) {
+    return concat(ImmutableList.copyOf(sources));
+  }
+
+  /**
+   * Returns a view of the given byte array as a {@link ByteSource}. To view only a specific range
+   * in the array, use {@code ByteSource.wrap(b).slice(offset, length)}.
+   *
+   * @since 15.0 (since 14.0 as {@code ByteStreams.asByteSource(byte[])}).
+   */
+  public static ByteSource wrap(byte[] b) {
+    return new ByteArrayByteSource(b);
+  }
+
+  /**
+   * Returns an immutable {@link ByteSource} that contains no bytes.
+   *
+   * @since 15.0
+   */
+  public static ByteSource empty() {
+    return EmptyByteSource.INSTANCE;
+  }
+
+  /**
    * A char source that reads bytes from this source and decodes them as characters using a
    * charset.
    */
@@ -310,7 +427,15 @@ public abstract class ByteSource {
 
     @Override
     public InputStream openStream() throws IOException {
-      InputStream in = ByteSource.this.openStream();
+      return sliceStream(ByteSource.this.openStream());
+    }
+
+    @Override
+    public InputStream openBufferedStream() throws IOException {
+      return sliceStream(ByteSource.this.openBufferedStream());
+    }
+
+    private InputStream sliceStream(InputStream in) throws IOException {
       if (offset > 0) {
         try {
           ByteStreams.skipFully(in, offset);
@@ -336,8 +461,128 @@ public abstract class ByteSource {
     }
 
     @Override
+    public boolean isEmpty() throws IOException {
+      return length == 0 || super.isEmpty();
+    }
+
+    @Override
     public String toString() {
       return ByteSource.this.toString() + ".slice(" + offset + ", " + length + ")";
+    }
+  }
+
+  private static class ByteArrayByteSource extends ByteSource {
+
+    protected final byte[] bytes;
+
+    protected ByteArrayByteSource(byte[] bytes) {
+      this.bytes = checkNotNull(bytes);
+    }
+
+    @Override
+    public InputStream openStream() {
+      return new ByteArrayInputStream(bytes);
+    }
+
+    @Override
+    public InputStream openBufferedStream() throws IOException {
+      return openStream();
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return bytes.length == 0;
+    }
+
+    @Override
+    public long size() {
+      return bytes.length;
+    }
+
+    @Override
+    public byte[] read() {
+      return bytes.clone();
+    }
+
+    @Override
+    public long copyTo(OutputStream output) throws IOException {
+      output.write(bytes);
+      return bytes.length;
+    }
+
+    @Override
+    public HashCode hash(HashFunction hashFunction) throws IOException {
+      return hashFunction.hashBytes(bytes);
+    }
+
+    // TODO(user): Possibly override slice()
+
+    @Override
+    public String toString() {
+      return "ByteSource.wrap(" + BaseEncoding.base16().encode(bytes) + ")";
+    }
+  }
+
+  private static final class EmptyByteSource extends ByteArrayByteSource {
+
+    private static final EmptyByteSource INSTANCE = new EmptyByteSource();
+
+    private EmptyByteSource() {
+      super(new byte[0]);
+    }
+
+    @Override
+    public CharSource asCharSource(Charset charset) {
+      checkNotNull(charset);
+      return CharSource.empty();
+    }
+
+    @Override
+    public byte[] read() {
+      return bytes; // length is 0, no need to clone
+    }
+
+    @Override
+    public String toString() {
+      return "ByteSource.empty()";
+    }
+  }
+
+  private static final class ConcatenatedByteSource extends ByteSource {
+
+    private final Iterable<? extends ByteSource> sources;
+
+    ConcatenatedByteSource(Iterable<? extends ByteSource> sources) {
+      this.sources = checkNotNull(sources);
+    }
+
+    @Override
+    public InputStream openStream() throws IOException {
+      return new MultiInputStream(sources.iterator());
+    }
+
+    @Override
+    public boolean isEmpty() throws IOException {
+      for (ByteSource source : sources) {
+        if (!source.isEmpty()) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    @Override
+    public long size() throws IOException {
+      long result = 0L;
+      for (ByteSource source : sources) {
+        result += source.size();
+      }
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "ByteSource.concat(" + sources + ")";
     }
   }
 }

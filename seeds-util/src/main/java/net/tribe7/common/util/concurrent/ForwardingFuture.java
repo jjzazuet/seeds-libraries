@@ -16,13 +16,13 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.base.Preconditions;
-import net.tribe7.common.collect.ForwardingObject;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.tribe7.common.base.Preconditions;
+import net.tribe7.common.collect.ForwardingObject;
 
 /**
  * A {@link Future} which forwards all its method calls to another future.

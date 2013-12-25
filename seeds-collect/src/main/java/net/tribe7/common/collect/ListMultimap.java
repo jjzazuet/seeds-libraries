@@ -16,13 +16,13 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A {@code Multimap} that can hold duplicate key-value pairs and that maintains
@@ -75,8 +75,10 @@ public interface ListMultimap<K, V> extends Multimap<K, V> {
   /**
    * {@inheritDoc}
    *
-   * <p>Though the method signature doesn't say so explicitly, the returned map
-   * has {@link List} values.
+   * <p><b>Note:</b> The returned map's values are guaranteed to be of type
+   * {@link List}. To obtain this map with the more specific generic type
+   * {@code Map<K, List<V>>}, call {@link Multimaps#asMap(ListMultimap)}
+   * instead.
    */
   @Override
   Map<K, Collection<V>> asMap();

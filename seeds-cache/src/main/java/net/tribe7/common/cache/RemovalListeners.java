@@ -18,9 +18,9 @@ package net.tribe7.common.cache;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.concurrent.Executor;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A collection of common removal listeners.

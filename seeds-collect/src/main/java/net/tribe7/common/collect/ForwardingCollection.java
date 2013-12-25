@@ -16,13 +16,13 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Objects;
-
 import java.util.Collection;
 import java.util.Iterator;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * A collection which forwards all its method calls to another collection.
@@ -138,12 +138,7 @@ public abstract class ForwardingCollection<E> extends ForwardingObject
    * @since 7.0
    */
   protected boolean standardContainsAll(Collection<?> collection) {
-    for (Object o : collection) {
-      if (!contains(o)) {
-        return false;
-      }
-    }
-    return true;
+    return Collections2.containsAllImpl(this, collection);
   }
 
   /**

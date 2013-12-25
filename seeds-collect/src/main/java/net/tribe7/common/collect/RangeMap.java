@@ -16,11 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A mapping from disjoint nonempty ranges to non-null values. Queries look up the value

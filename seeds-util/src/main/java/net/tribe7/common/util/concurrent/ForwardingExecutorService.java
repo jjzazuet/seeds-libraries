@@ -16,8 +16,6 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.collect.ForwardingObject;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -26,6 +24,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.tribe7.common.collect.ForwardingObject;
 
 /**
  * An executor service which forwards all its method calls to another executor

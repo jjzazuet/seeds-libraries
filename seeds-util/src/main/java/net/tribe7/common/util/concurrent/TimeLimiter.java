@@ -16,10 +16,10 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * Produces proxies that impose a time limit on method
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  *     return DEFAULT_VALUE;
  *   }
  * </pre>
- * Please see {@code SimpleTimeLimiterTest} for more usage examples.
+ * <p>Please see {@code SimpleTimeLimiterTest} for more usage examples.
  *
  * @author Kevin Bourrillion
  * @since 1.0

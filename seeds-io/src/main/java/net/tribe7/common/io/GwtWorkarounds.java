@@ -17,14 +17,14 @@ package net.tribe7.common.io;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkPositionIndexes;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * Provides simple GWT-compatible substitutes for {@code InputStream}, {@code OutputStream},

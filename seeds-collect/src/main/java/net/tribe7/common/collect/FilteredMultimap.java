@@ -16,25 +16,19 @@
 
 package net.tribe7.common.collect;
 
-import static net.tribe7.common.base.Preconditions.checkNotNull;
+import java.util.Map.Entry;
 
 import net.tribe7.common.annotations.GwtCompatible;
 import net.tribe7.common.base.Predicate;
 
-import java.util.Map.Entry;
-
 /**
- * A superclass of all filtered multimap types.
+ * An interface for all filtered multimap types.
  * 
  * @author Louis Wasserman
  */
 @GwtCompatible
-abstract class FilteredMultimap<K, V> extends AbstractMultimap<K, V> {
-  final Multimap<K, V> unfiltered;
-  
-  FilteredMultimap(Multimap<K, V> unfiltered) {
-    this.unfiltered = checkNotNull(unfiltered);
-  }
+interface FilteredMultimap<K, V> extends Multimap<K, V> {  
+  Multimap<K, V> unfiltered();
 
-  abstract Predicate<? super Entry<K, V>> entryPredicate();
+  Predicate<? super Entry<K, V>> entryPredicate();
 }

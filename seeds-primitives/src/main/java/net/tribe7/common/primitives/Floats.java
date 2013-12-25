@@ -16,16 +16,12 @@
 
 package net.tribe7.common.primitives;
 
+import static java.lang.Float.NEGATIVE_INFINITY;
+import static java.lang.Float.POSITIVE_INFINITY;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkElementIndex;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkPositionIndexes;
-import static java.lang.Float.NEGATIVE_INFINITY;
-import static java.lang.Float.POSITIVE_INFINITY;
-
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
 
 import java.io.Serializable;
 import java.util.AbstractList;
@@ -37,6 +33,10 @@ import java.util.List;
 import java.util.RandomAccess;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * Static utility methods pertaining to {@code float} primitives, that are not

@@ -18,10 +18,7 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkState;
-
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.base.Objects;
+import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,6 +30,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * A general-purpose bimap implementation using any two backing {@code Map}
@@ -318,7 +319,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
         }
 
         @Override public void remove() {
-          checkState(entry != null);
+          checkRemove(entry != null);
           V value = entry.getValue();
           iterator.remove();
           removeFromInverseMap(value);

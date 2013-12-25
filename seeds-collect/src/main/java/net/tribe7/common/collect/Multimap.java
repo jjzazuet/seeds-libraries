@@ -16,14 +16,14 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A collection that maps keys to values, similar to {@link Map}, but in which
@@ -68,9 +68,9 @@ import javax.annotation.Nullable;
  * ... produces output such as: <pre>   {@code
  *
  *   Zachary: [Taylor]
- *   John: [Adams, Adams, Tyler, Kennedy]
+ *   John: [Adams, Adams, Tyler, Kennedy]  // Remember, Quincy!
  *   George: [Washington, Bush, Bush]
- *   Grover: [Cleveland]
+ *   Grover: [Cleveland, Cleveland]        // Two, non-consecutive terms, rep'ing NJ!
  *   ...}</pre>
  *
  * <h3>Views</h3>
@@ -119,9 +119,9 @@ import javax.annotation.Nullable;
  * <li>There is no need to populate an empty collection before adding an entry
  *     with {@link #put put}.
  * <li>{@code get} never returns {@code null}, only an empty collection.
- * <li>A key contained in the multimap always maps to at least one value. Any
- *     operation that causes a key to have zero associated values has the effect
- *     of <i>removing</i> that key from the multimap.
+ * <li>A key is contained in the multimap if and only if it maps to at least 
+ *     one value. Any operation that causes a key to have zero associated 
+ *     values has the effect of <i>removing</i> that key from the multimap.
  * <li>The total entry count is available as {@link #size}.
  * <li>Many complex operations become easier; for example, {@code
  *     Collections.min(multimap.values())} finds the smallest value across all
@@ -141,6 +141,11 @@ import javax.annotation.Nullable;
  * to multimaps.
  *
  * <h3>Other Notes</h3>
+ * 
+ * <p>As with {@code Map}, the behavior of a {@code Multimap} is not specified 
+ * if key objects already present in the multimap change in a manner that 
+ * affects {@code equals} comparisons.  Use caution if mutable objects are used 
+ * as keys in a {@code Multimap}.
  *
  * <p>All methods that modify the multimap are optional. The view collections
  * returned by the multimap may or may not be modifiable. Any modification
@@ -218,7 +223,15 @@ public interface Multimap<K, V> {
   // Bulk Operations
 
   /**
-   * Stores a collection of values with the same key.
+   * Stores key-value pairs in this multimap with one key and multiple values.
+   * 
+   * <p>This is equivalent to <pre>   {@code
+   * 
+   *   for (V value : values) {
+   *     put(key, value);
+   *   } }</pre>
+   * 
+   * <p>In particular, this is a no-op if {@code values} is empty.
    *
    * @param key key to store in the multimap
    * @param values values to store in the multimap
@@ -239,6 +252,9 @@ public interface Multimap<K, V> {
   /**
    * Stores a collection of values with the same key, replacing any existing
    * values for that key.
+   * 
+   * <p>If {@code values} is empty, this is equivalent to 
+   * {@link #removeAll(Object) removeAll(key)}.
    *
    * @param key key to store in the multimap
    * @param values values to store in the multimap
@@ -251,6 +267,10 @@ public interface Multimap<K, V> {
 
   /**
    * Removes all values associated with a given key.
+   * 
+   * <p>Once this method returns, {@code key} will not be mapped to any values,
+   * so it will not appear in {@link #keySet()}, {@link #asMap()}, or any other
+   * views. 
    *
    * @param key key of entries to remove from the multimap
    * @return the collection of removed values, or an empty collection if no
@@ -286,6 +306,9 @@ public interface Multimap<K, V> {
    * Returns the set of all keys, each appearing once in the returned set.
    * Changes to the returned set will update the underlying multimap, and vice
    * versa.
+   * 
+   * <p>Note that the key set contains a key if and only if this multimap maps
+   * that key to at least one value.
    *
    * @return the collection of distinct keys
    */

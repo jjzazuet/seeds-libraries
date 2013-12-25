@@ -18,9 +18,9 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkState;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.NoSuchElementException;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * This class provides a skeletal implementation of the {@code Iterator}
@@ -53,13 +53,13 @@ import java.util.NoSuchElementException;
  *     };
  *   }}</pre>
  *
- * This class supports iterators that include null elements.
+ * <p>This class supports iterators that include null elements.
  *
  * @author Kevin Bourrillion
  * @since 2.0 (imported from Google Collections Library)
  */
 // When making changes to this class, please also update the copy at
-// net.tribe7.common.base.AbstractIterator
+// com.google.common.base.AbstractIterator
 @GwtCompatible
 public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
   private State state = State.NOT_READY;

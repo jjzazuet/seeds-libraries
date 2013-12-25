@@ -18,10 +18,6 @@ package net.tribe7.common.base;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +26,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * Static utility methods pertaining to {@code Predicate} instances.

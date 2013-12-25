@@ -17,11 +17,11 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Comparator;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * An empty immutable sorted map.
@@ -86,6 +86,11 @@ final class EmptyImmutableSortedMap<K, V> extends ImmutableSortedMap<K, V> {
   @Override
   ImmutableSet<Entry<K, V>> createEntrySet() {
     throw new AssertionError("should never be called");
+  }
+
+  @Override
+  public ImmutableSetMultimap<K, V> asMultimap() {
+    return ImmutableSetMultimap.of();
   }
 
   @Override

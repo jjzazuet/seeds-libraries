@@ -18,10 +18,10 @@ package net.tribe7.common.util.concurrent;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A TimeLimiter implementation which actually does not attempt to limit time

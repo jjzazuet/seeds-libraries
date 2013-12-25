@@ -16,9 +16,9 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Bimap with no mappings.
@@ -59,6 +59,11 @@ final class EmptyImmutableBiMap extends ImmutableBiMap<Object, Object> {
   @Override
   ImmutableSet<Entry<Object, Object>> createEntrySet() {
     throw new AssertionError("should never be called");
+  }
+
+  @Override
+  public ImmutableSetMultimap<Object, Object> asMultimap() {
+    return ImmutableSetMultimap.of();
   }
 
   @Override

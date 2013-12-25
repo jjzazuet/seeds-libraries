@@ -44,7 +44,7 @@ import java.nio.charset.Charset;
  * @since 14.0
  * @author Colin Decker
  */
-public abstract class ByteSink {
+public abstract class ByteSink implements OutputSupplier<OutputStream> {
 
   /**
    * Returns a {@link CharSink} view of this {@code ByteSink} that writes characters to this sink
@@ -65,14 +65,33 @@ public abstract class ByteSink {
   public abstract OutputStream openStream() throws IOException;
 
   /**
-   * Opens a new {@link BufferedOutputStream} for writing to this sink. This method should return a
-   * new, independent stream each time it is called.
+   * This method is a temporary method provided for easing migration from suppliers to sources and
+   * sinks.
+   *
+   * @since 15.0
+   * @deprecated This method is only provided for temporary compatibility with the
+   *     {@link OutputSupplier} interface and should not be called directly. Use
+   *     {@link #openStream} instead.
+   */
+  @Override
+  @Deprecated
+  public final OutputStream getOutput() throws IOException {
+    return openStream();
+  }
+
+  /**
+   * Opens a new buffered {@link OutputStream} for writing to this sink. The returned stream is
+   * not required to be a {@link BufferedOutputStream} in order to allow implementations to simply
+   * delegate to {@link #openStream()} when the stream returned by that method does not benefit
+   * from additional buffering (for example, a {@code ByteArrayOutputStream}). This method should
+   * return a new, independent stream each time it is called.
    *
    * <p>The caller is responsible for ensuring that the returned stream is closed.
    *
    * @throws IOException if an I/O error occurs in the process of opening the stream
+   * @since 15.0 (in 14.0 with return type {@link BufferedOutputStream})
    */
-  public BufferedOutputStream openBufferedStream() throws IOException {
+  public OutputStream openBufferedStream() throws IOException {
     OutputStream out = openStream();
     return (out instanceof BufferedOutputStream)
         ? (BufferedOutputStream) out
@@ -91,6 +110,7 @@ public abstract class ByteSink {
     try {
       OutputStream out = closer.register(openStream());
       out.write(bytes);
+      out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
     } catch (Throwable e) {
       throw closer.rethrow(e);
     } finally {
@@ -111,7 +131,9 @@ public abstract class ByteSink {
     Closer closer = Closer.create();
     try {
       OutputStream out = closer.register(openStream());
-      return ByteStreams.copy(input, out);
+      long written = ByteStreams.copy(input, out);
+      out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
+      return written;
     } catch (Throwable e) {
       throw closer.rethrow(e);
     } finally {

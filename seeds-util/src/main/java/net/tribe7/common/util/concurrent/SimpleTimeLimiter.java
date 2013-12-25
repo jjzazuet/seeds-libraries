@@ -19,10 +19,6 @@ package net.tribe7.common.util.concurrent;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.collect.ObjectArrays;
-import net.tribe7.common.collect.Sets;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,6 +31,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.collect.ObjectArrays;
+import net.tribe7.common.collect.Sets;
 
 /**
  * A TimeLimiter that runs method calls in the background using an

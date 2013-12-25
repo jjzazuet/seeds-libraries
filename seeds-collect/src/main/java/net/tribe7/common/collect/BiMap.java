@@ -16,12 +16,12 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A bimap (or "bidirectional map") is a map that preserves the uniqueness of

@@ -16,8 +16,6 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -25,6 +23,8 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A {@code SetMultimap} whose set of values for a given key are kept sorted;
@@ -100,11 +100,12 @@ public interface SortedSetMultimap<K, V> extends SetMultimap<K, V> {
    * live collection. When passed a key that is not present, however, {@code
    * asMap().get(Object)} returns {@code null} instead of an empty collection.
    *
-   * <p>Though the method signature doesn't say so explicitly, the returned map
-   * has {@link SortedSet} values.
+   * <p><b>Note:</b> The returned map's values are guaranteed to be of type
+   * {@link SortedSet}. To obtain this map with the more specific generic type
+   * {@code Map<K, SortedSet<V>>}, call
+   * {@link Multimaps#asMap(SortedSetMultimap)} instead.
    */
-  @Override
-  Map<K, Collection<V>> asMap();
+  @Override Map<K, Collection<V>> asMap();
 
   /**
    * Returns the comparator that orders the multimap values, with {@code null}

@@ -16,13 +16,13 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Interface that extends {@code Table} and whose rows are sorted.

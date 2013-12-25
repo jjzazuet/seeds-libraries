@@ -18,13 +18,15 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * An immutable {@link Table} with reliable user-specified iteration order.
@@ -43,15 +45,20 @@ import javax.annotation.Nullable;
  */
 @GwtCompatible
 // TODO(gak): make serializable
-public abstract class ImmutableTable<R, C, V> implements Table<R, C, V> {
+public abstract class ImmutableTable<R, C, V> extends AbstractTable<R, C, V> {
+  private static final ImmutableTable<Object, Object, Object> EMPTY
+    = new SparseImmutableTable<Object, Object, Object>(
+        ImmutableList.<Cell<Object, Object, Object>>of(),
+        ImmutableSet.of(), ImmutableSet.of());
+  
   /** Returns an empty immutable table. */
   @SuppressWarnings("unchecked")
-  public static final <R, C, V> ImmutableTable<R, C, V> of() {
-    return (ImmutableTable<R, C, V>) EmptyImmutableTable.INSTANCE;
+  public static <R, C, V> ImmutableTable<R, C, V> of() {
+    return (ImmutableTable<R, C, V>) EMPTY;
   }
 
   /** Returns an immutable table containing a single cell. */
-  public static final <R, C, V> ImmutableTable<R, C, V> of(R rowKey,
+  public static <R, C, V> ImmutableTable<R, C, V> of(R rowKey,
       C columnKey, V value) {
     return new SingletonImmutableTable<R, C, V>(rowKey, columnKey, value);
   }
@@ -70,7 +77,7 @@ public abstract class ImmutableTable<R, C, V> implements Table<R, C, V> {
    * the data when it is safe to do so. The exact circumstances under which a
    * copy will or will not be performed are undocumented and subject to change.
    */
-  public static final <R, C, V> ImmutableTable<R, C, V> copyOf(
+  public static <R, C, V> ImmutableTable<R, C, V> copyOf(
       Table<? extends R, ? extends C, ? extends V> table) {
     if (table instanceof ImmutableTable) {
       @SuppressWarnings("unchecked")
@@ -108,7 +115,7 @@ public abstract class ImmutableTable<R, C, V> implements Table<R, C, V> {
    * Returns a new builder. The generated builder is equivalent to the builder
    * created by the {@link Builder#ImmutableTable.Builder()} constructor.
    */
-  public static final <R, C, V> Builder<R, C, V> builder() {
+  public static <R, C, V> Builder<R, C, V> builder() {
     return new Builder<R, C, V>();
   }
 
@@ -242,16 +249,46 @@ public abstract class ImmutableTable<R, C, V> implements Table<R, C, V> {
 
   ImmutableTable() {}
 
-  @Override public abstract ImmutableSet<Cell<R, C, V>> cellSet();
+  @Override public ImmutableSet<Cell<R, C, V>> cellSet() {
+    return (ImmutableSet<Cell<R, C, V>>) super.cellSet();
+  }
+
+  @Override
+  abstract ImmutableSet<Cell<R, C, V>> createCellSet();
+
+  @Override
+  final UnmodifiableIterator<Cell<R, C, V>> cellIterator() {
+    throw new AssertionError("should never be called");
+  }
+
+  @Override
+  public ImmutableCollection<V> values() {
+    return (ImmutableCollection<V>) super.values();
+  }
+
+  @Override
+  abstract ImmutableCollection<V> createValues();
+
+  @Override
+  final Iterator<V> valuesIterator() {
+    throw new AssertionError("should never be called"); 
+  }
 
   /**
    * {@inheritDoc}
    *
    * @throws NullPointerException if {@code columnKey} is {@code null}
    */
-  @Override public abstract ImmutableMap<R, V> column(C columnKey);
+  @Override public ImmutableMap<R, V> column(C columnKey) {
+    checkNotNull(columnKey);
+    return Objects.firstNonNull(
+        (ImmutableMap<R, V>) columnMap().get(columnKey),
+        ImmutableMap.<R, V>of());
+  }
 
-  @Override public abstract ImmutableSet<C> columnKeySet();
+  @Override public ImmutableSet<C> columnKeySet() {
+    return columnMap().keySet();
+  }
 
   /**
    * {@inheritDoc}
@@ -266,9 +303,16 @@ public abstract class ImmutableTable<R, C, V> implements Table<R, C, V> {
    *
    * @throws NullPointerException if {@code rowKey} is {@code null}
    */
-  @Override public abstract ImmutableMap<C, V> row(R rowKey);
+  @Override public ImmutableMap<C, V> row(R rowKey) {
+    checkNotNull(rowKey);
+    return Objects.firstNonNull(
+        (ImmutableMap<C, V>) rowMap().get(rowKey),
+        ImmutableMap.<C, V>of());
+  }
 
-  @Override public abstract ImmutableSet<R> rowKeySet();
+  @Override public ImmutableSet<R> rowKeySet() {
+    return rowMap().keySet();
+  }
 
   /**
    * {@inheritDoc}
@@ -277,6 +321,16 @@ public abstract class ImmutableTable<R, C, V> implements Table<R, C, V> {
    * {@link ImmutableMap} instances as well.
    */
   @Override public abstract ImmutableMap<R, Map<C, V>> rowMap();
+
+  @Override
+  public boolean contains(@Nullable Object rowKey, @Nullable Object columnKey) {
+    return get(rowKey, columnKey) != null;    
+  }
+
+  @Override
+  public boolean containsValue(@Nullable Object value) {
+    return values().contains(value);
+  }
 
   /**
    * Guaranteed to throw an exception and leave the table unmodified.
@@ -317,24 +371,5 @@ public abstract class ImmutableTable<R, C, V> implements Table<R, C, V> {
    */
   @Deprecated @Override public final V remove(Object rowKey, Object columnKey) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override public boolean equals(@Nullable Object obj) {
-    if (obj == this) {
-      return true;
-    } else if (obj instanceof Table) {
-      Table<?, ?, ?> that = (Table<?, ?, ?>) obj;
-      return this.cellSet().equals(that.cellSet());
-    } else {
-      return false;
-    }
-  }
-
-  @Override public int hashCode() {
-    return cellSet().hashCode();
-  }
-
-  @Override public String toString() {
-    return rowMap().toString();
   }
 }

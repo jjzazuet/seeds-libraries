@@ -16,11 +16,11 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.collect.ForwardingQueue;
-
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import net.tribe7.common.collect.ForwardingQueue;
 
 /**
  * A {@link BlockingQueue} which forwards all its method calls to another

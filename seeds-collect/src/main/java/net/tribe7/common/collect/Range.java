@@ -18,12 +18,6 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Equivalence;
-import net.tribe7.common.base.Function;
-import net.tribe7.common.base.Predicate;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +27,12 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Equivalence;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.base.Predicate;
 
 /**
  * A range (or "interval") defines the <i>boundaries</i> around a contiguous span of values of some
@@ -431,7 +431,7 @@ public final class Range<C extends Comparable> implements Predicate<C>, Serializ
    * can't be constructed at all.)
    *
    * <p>Note that certain discrete ranges such as the integer range {@code (3..4)} are <b>not</b>
-   * considered empty, even though they contain no actual values.  In these cases, it may be 
+   * considered empty, even though they contain no actual values.  In these cases, it may be
    * helpful to preprocess ranges with {@link #canonical(DiscreteDomain)}.
    */
   public boolean isEmpty() {
@@ -498,8 +498,9 @@ public final class Range<C extends Comparable> implements Predicate<C>, Serializ
    *     contained by the latter range)
    * </ul>
    *
-   * Note that if {@code a.encloses(b)}, then {@code b.contains(v)} implies {@code a.contains(v)},
-   * but as the last two examples illustrate, the converse is not always true.
+   * <p>Note that if {@code a.encloses(b)}, then {@code b.contains(v)} implies
+   * {@code a.contains(v)}, but as the last two examples illustrate, the converse is not always
+   * true.
    *
    * <p>Being reflexive, antisymmetric and transitive, the {@code encloses} relation defines a
    * <i>partial order</i> over ranges. There exists a unique {@linkplain Range#all maximal} range
@@ -529,9 +530,9 @@ public final class Range<C extends Comparable> implements Predicate<C>, Serializ
    *
    * <p>The connectedness relation is both reflexive and symmetric, but does not form an {@linkplain
    * Equivalence equivalence relation} as it is not transitive.
-   * 
+   *
    * <p>Note that certain discrete ranges are not considered connected, even though there are no
-   * elements "between them."  For example, {@code [3, 5]} is not considered connected to {@code 
+   * elements "between them."  For example, {@code [3, 5]} is not considered connected to {@code
    * [6, 10]}.  In these cases, it may be desirable for both input ranges to be preprocessed with
    * {@link #canonical(DiscreteDomain)} before testing for connectedness.
    */
@@ -613,9 +614,8 @@ public final class Range<C extends Comparable> implements Predicate<C>, Serializ
    *
    * @throws IllegalArgumentException if neither this range nor the domain has a lower bound, or if
    *     neither has an upper bound
-   * @deprecated Use {@code ContiguousSet.create(range, domain)} instead.
+   * @deprecated Use {@code ContiguousSet.create(range, domain)}. To be removed in Guava 16.0.
    */
-  // TODO(kevinb): commit in spec to which methods are efficient?
   @Beta
   @GwtCompatible(serializable = false)
   @Deprecated
@@ -637,7 +637,7 @@ public final class Range<C extends Comparable> implements Predicate<C>, Serializ
    * <li>idempotence: {@code a.canonical(domain).canonical(domain).equals(a.canonical(domain))}
    * </ul>
    *
-   * Furthermore, this method guarantees that the range returned will be one of the following
+   * <p>Furthermore, this method guarantees that the range returned will be one of the following
    * canonical forms:
    *
    * <ul>

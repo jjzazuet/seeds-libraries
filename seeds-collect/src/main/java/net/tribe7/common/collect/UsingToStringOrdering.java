@@ -16,9 +16,9 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * An ordering that uses the natural order of the string representation of the

@@ -16,13 +16,13 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Basic implementation of the {@link ListMultimap} interface. It's a wrapper

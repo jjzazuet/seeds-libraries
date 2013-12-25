@@ -16,10 +16,10 @@
 
 package net.tribe7.common.collect;
 
+import java.util.ListIterator;
+
 import net.tribe7.common.annotations.GwtCompatible;
 import net.tribe7.common.base.Function;
-
-import java.util.ListIterator;
 
 /**
  * An iterator that transforms a backing list iterator; for internal use. This

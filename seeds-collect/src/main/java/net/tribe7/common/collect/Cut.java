@@ -16,13 +16,13 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.primitives.Booleans;
-
 import java.io.Serializable;
 import java.util.NoSuchElementException;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.primitives.Booleans;
 
 /**
  * Implementation detail for the internal structure of {@link Range} instances. Represents

@@ -16,14 +16,14 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * A class for reading lines of text. Provides the same functionality

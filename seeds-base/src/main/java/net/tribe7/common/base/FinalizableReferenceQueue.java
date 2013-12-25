@@ -16,9 +16,7 @@
 
 package net.tribe7.common.base;
 
-import net.tribe7.common.annotations.VisibleForTesting;
 import java.io.Closeable;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.PhantomReference;
@@ -29,6 +27,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.tribe7.common.annotations.VisibleForTesting;
 
 /**
  * A reference queue with an associated background thread that dequeues references and invokes
@@ -80,7 +80,7 @@ public class FinalizableReferenceQueue implements Closeable {
 
   private static final Logger logger = Logger.getLogger(FinalizableReferenceQueue.class.getName());
 
-  private static final String FINALIZER_CLASS_NAME = "net.tribe7.common.base.internal.Finalizer";
+  private static final String FINALIZER_CLASS_NAME = "com.google.common.base.internal.Finalizer";
 
   /** Reference to Finalizer.startFinalizer(). */
   private static final Method startFinalizer;

@@ -16,39 +16,12 @@
 
 package net.tribe7.common.cache;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkState;
 import static net.tribe7.common.cache.CacheBuilder.NULL_TICKER;
 import static net.tribe7.common.cache.CacheBuilder.UNSET_INT;
 import static net.tribe7.common.util.concurrent.Uninterruptibles.getUninterruptibly;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.base.Equivalence;
-import net.tribe7.common.base.Stopwatch;
-import net.tribe7.common.base.Ticker;
-import net.tribe7.common.cache.AbstractCache.SimpleStatsCounter;
-import net.tribe7.common.cache.AbstractCache.StatsCounter;
-import net.tribe7.common.cache.CacheBuilder.NullListener;
-import net.tribe7.common.cache.CacheBuilder.OneWeigher;
-import net.tribe7.common.cache.CacheLoader.InvalidCacheLoadException;
-import net.tribe7.common.cache.CacheLoader.UnsupportedLoadingOperationException;
-import net.tribe7.common.collect.AbstractSequentialIterator;
-import net.tribe7.common.collect.ImmutableMap;
-import net.tribe7.common.collect.Iterators;
-import net.tribe7.common.collect.Maps;
-import net.tribe7.common.collect.Sets;
-import net.tribe7.common.primitives.Ints;
-import net.tribe7.common.util.concurrent.ExecutionError;
-import net.tribe7.common.util.concurrent.Futures;
-import net.tribe7.common.util.concurrent.ListenableFuture;
-import net.tribe7.common.util.concurrent.ListeningExecutorService;
-import net.tribe7.common.util.concurrent.MoreExecutors;
-import net.tribe7.common.util.concurrent.SettableFuture;
-import net.tribe7.common.util.concurrent.UncheckedExecutionException;
-import net.tribe7.common.util.concurrent.Uninterruptibles;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -80,6 +53,34 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.base.Equivalence;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.base.Stopwatch;
+import net.tribe7.common.base.Ticker;
+import net.tribe7.common.cache.AbstractCache.SimpleStatsCounter;
+import net.tribe7.common.cache.AbstractCache.StatsCounter;
+import net.tribe7.common.cache.CacheBuilder.NullListener;
+import net.tribe7.common.cache.CacheBuilder.OneWeigher;
+import net.tribe7.common.cache.CacheLoader.InvalidCacheLoadException;
+import net.tribe7.common.cache.CacheLoader.UnsupportedLoadingOperationException;
+import net.tribe7.common.collect.AbstractSequentialIterator;
+import net.tribe7.common.collect.ImmutableMap;
+import net.tribe7.common.collect.Iterators;
+import net.tribe7.common.collect.Maps;
+import net.tribe7.common.collect.Sets;
+import net.tribe7.common.primitives.Ints;
+import net.tribe7.common.util.concurrent.ExecutionError;
+import net.tribe7.common.util.concurrent.Futures;
+import net.tribe7.common.util.concurrent.ListenableFuture;
+import net.tribe7.common.util.concurrent.ListeningExecutorService;
+import net.tribe7.common.util.concurrent.MoreExecutors;
+import net.tribe7.common.util.concurrent.SettableFuture;
+import net.tribe7.common.util.concurrent.UncheckedExecutionException;
+import net.tribe7.common.util.concurrent.Uninterruptibles;
+
 /**
  * The concurrent hash map implementation built by {@link CacheBuilder}.
  *
@@ -87,7 +88,7 @@ import javax.annotation.concurrent.GuardedBy;
  * href="http://tinyurl.com/ConcurrentHashMap">ConcurrentHashMap.java</a>.
  *
  * @author Charles Fry
- * @author Bob Lee ({@code net.tribe7.common.collect.MapMaker})
+ * @author Bob Lee ({@code com.google.common.collect.MapMaker})
  * @author Doug Lea ({@code ConcurrentHashMap})
  */
 @GwtCompatible(emulated = true)
@@ -1061,7 +1062,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
   /**
    * Used for strongly-referenced keys.
    */
-  static class StrongEntry<K, V> implements ReferenceEntry<K, V> {
+  static class StrongEntry<K, V> extends AbstractReferenceEntry<K, V> {
     final K key;
 
     StrongEntry(K key, int hash, @Nullable ReferenceEntry<K, V> next) {
@@ -1073,70 +1074,6 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     @Override
     public K getKey() {
       return this.key;
-    }
-
-    // null access
-
-    @Override
-    public long getAccessTime() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setAccessTime(long time) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ReferenceEntry<K, V> getNextInAccessQueue() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setNextInAccessQueue(ReferenceEntry<K, V> next) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ReferenceEntry<K, V> getPreviousInAccessQueue() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setPreviousInAccessQueue(ReferenceEntry<K, V> previous) {
-      throw new UnsupportedOperationException();
-    }
-
-    // null write
-
-    @Override
-    public long getWriteTime() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setWriteTime(long time) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ReferenceEntry<K, V> getNextInWriteQueue() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setNextInWriteQueue(ReferenceEntry<K, V> next) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ReferenceEntry<K, V> getPreviousInWriteQueue() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setPreviousInWriteQueue(ReferenceEntry<K, V> previous) {
-      throw new UnsupportedOperationException();
     }
 
     // The code below is exactly the same for each entry type.
@@ -1166,8 +1103,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     }
   }
 
-  static final class StrongAccessEntry<K, V> extends StrongEntry<K, V>
-      implements ReferenceEntry<K, V> {
+  static final class StrongAccessEntry<K, V> extends StrongEntry<K, V> {
     StrongAccessEntry(K key, int hash, @Nullable ReferenceEntry<K, V> next) {
       super(key, hash, next);
     }
@@ -1213,8 +1149,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     }
   }
 
-  static final class StrongWriteEntry<K, V>
-      extends StrongEntry<K, V> implements ReferenceEntry<K, V> {
+  static final class StrongWriteEntry<K, V> extends StrongEntry<K, V> {
     StrongWriteEntry(K key, int hash, @Nullable ReferenceEntry<K, V> next) {
       super(key, hash, next);
     }
@@ -1260,8 +1195,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     }
   }
 
-  static final class StrongAccessWriteEntry<K, V>
-      extends StrongEntry<K, V> implements ReferenceEntry<K, V> {
+  static final class StrongAccessWriteEntry<K, V> extends StrongEntry<K, V> {
     StrongAccessWriteEntry(K key, int hash, @Nullable ReferenceEntry<K, V> next) {
       super(key, hash, next);
     }
@@ -1362,6 +1296,11 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
       return get();
     }
 
+    /*
+     * It'd be nice to get these for free from AbstractReferenceEntry, but we're already extending
+     * WeakReference<K>.
+     */
+
     // null access
 
     @Override
@@ -1453,8 +1392,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     }
   }
 
-  static final class WeakAccessEntry<K, V>
-      extends WeakEntry<K, V> implements ReferenceEntry<K, V> {
+  static final class WeakAccessEntry<K, V> extends WeakEntry<K, V> {
     WeakAccessEntry(
         ReferenceQueue<K> queue, K key, int hash, @Nullable ReferenceEntry<K, V> next) {
       super(queue, key, hash, next);
@@ -1501,8 +1439,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     }
   }
 
-  static final class WeakWriteEntry<K, V>
-      extends WeakEntry<K, V> implements ReferenceEntry<K, V> {
+  static final class WeakWriteEntry<K, V> extends WeakEntry<K, V> {
     WeakWriteEntry(
         ReferenceQueue<K> queue, K key, int hash, @Nullable ReferenceEntry<K, V> next) {
       super(queue, key, hash, next);
@@ -1549,8 +1486,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     }
   }
 
-  static final class WeakAccessWriteEntry<K, V>
-      extends WeakEntry<K, V> implements ReferenceEntry<K, V> {
+  static final class WeakAccessWriteEntry<K, V> extends WeakEntry<K, V> {
     WeakAccessWriteEntry(
         ReferenceQueue<K> queue, K key, int hash, @Nullable ReferenceEntry<K, V> next) {
       super(queue, key, hash, next);
@@ -2090,7 +2026,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
 
     /**
      * The table is expanded when its size exceeds this threshold. (The value of this field is
-     * always {@code (int)(capacity * 0.75)}.)
+     * always {@code (int) (capacity * 0.75)}.)
      */
     int threshold;
 
@@ -2389,8 +2325,6 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
             public void run() {
               try {
                 V newValue = getAndRecordStats(key, hash, loadingValueReference, loadingFuture);
-                // update loadingFuture for the sake of other pending requests
-                loadingValueReference.set(newValue);
               } catch (Throwable t) {
                 logger.log(Level.WARNING, "Exception thrown during refresh", t);
                 loadingValueReference.setException(t);
@@ -3529,7 +3463,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
 
     // TODO(fry): rename get, then extend AbstractFuture instead of containing SettableFuture
     final SettableFuture<V> futureValue = SettableFuture.create();
-    final Stopwatch stopwatch = new Stopwatch();
+    final Stopwatch stopwatch = Stopwatch.createUnstarted();
 
     public LoadingValueReference() {
       this(LocalCache.<K, V>unset());
@@ -3559,22 +3493,11 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
     }
 
     public boolean setException(Throwable t) {
-      return setException(futureValue, t);
-    }
-
-    private static boolean setException(SettableFuture<?> future, Throwable t) {
-      try {
-        return future.setException(t);
-      } catch (Error e) {
-        // the error will already be propagated by the loading thread
-        return false;
-      }
+      return futureValue.setException(t);
     }
 
     private ListenableFuture<V> fullyFailedFuture(Throwable t) {
-      SettableFuture<V> future = SettableFuture.create();
-      setException(future, t);
-      return future;
+      return Futures.immediateFailedFuture(t);
     }
 
     @Override
@@ -3598,11 +3521,20 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
         if (previousValue == null) {
           V newValue = loader.load(key);
           return set(newValue) ? futureValue : Futures.immediateFuture(newValue);
-        } else {
-          ListenableFuture<V> newValue = loader.reload(key, previousValue);
-          // rely on loadAsync to call set in order to avoid adding a second listener here
-          return newValue != null ? newValue : Futures.<V>immediateFuture(null);
         }
+        ListenableFuture<V> newValue = loader.reload(key, previousValue);
+        if (newValue == null) {
+          return Futures.immediateFuture(null);
+        }
+        // To avoid a race, make sure the refreshed value is set into loadingValueReference
+        // *before* returning newValue from the cache query.
+        return Futures.transform(newValue, new Function<V, V>() {
+          @Override
+          public V apply(V newValue) {
+            LoadingValueReference.this.set(newValue);
+            return newValue;
+          }
+        });
       } catch (Throwable t) {
         if (t instanceof InterruptedException) {
           Thread.currentThread().interrupt();
@@ -4080,7 +4012,7 @@ class LocalCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> 
       throws ExecutionException {
     checkNotNull(loader);
     checkNotNull(keys);
-    Stopwatch stopwatch = new Stopwatch().start();
+    Stopwatch stopwatch = Stopwatch.createStarted();
     Map<K, V> result;
     boolean success = false;
     try {

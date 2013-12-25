@@ -16,9 +16,6 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
@@ -28,6 +25,9 @@ import java.util.Comparator;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * An immutable {@link ListMultimap} with reliable user-specified key and value
@@ -149,7 +149,7 @@ public class ImmutableListMultimap<K, V>
    *           .putAll("many", 1, 2, 3, 4, 5)
    *           .build();}</pre>
    *
-   * Builder instances can be reused; it is safe to call {@link #build} multiple
+   * <p>Builder instances can be reused; it is safe to call {@link #build} multiple
    * times to build multiple multimaps in series. Each multimap contains the
    * key-value mappings in the previously created multimaps.
    *

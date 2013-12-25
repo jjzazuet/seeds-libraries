@@ -16,13 +16,13 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * This class provides a skeletal implementation of the {@link SortedMultiset} interface.

@@ -18,15 +18,15 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.collect.Multisets.setCountImpl;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Objects;
-
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * This class provides a skeletal implementation of the {@link Multiset}

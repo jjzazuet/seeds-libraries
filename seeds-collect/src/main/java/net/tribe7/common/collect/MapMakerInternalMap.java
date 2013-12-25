@@ -15,16 +15,7 @@
 package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
-import static net.tribe7.common.base.Preconditions.checkState;
-
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.base.Equivalence;
-import net.tribe7.common.base.Ticker;
-import net.tribe7.common.collect.GenericMapMaker.NullListener;
-import net.tribe7.common.collect.MapMaker.RemovalCause;
-import net.tribe7.common.collect.MapMaker.RemovalListener;
-import net.tribe7.common.collect.MapMaker.RemovalNotification;
-import net.tribe7.common.primitives.Ints;
+import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -57,6 +48,15 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
+
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.base.Equivalence;
+import net.tribe7.common.base.Ticker;
+import net.tribe7.common.collect.GenericMapMaker.NullListener;
+import net.tribe7.common.collect.MapMaker.RemovalCause;
+import net.tribe7.common.collect.MapMaker.RemovalListener;
+import net.tribe7.common.collect.MapMaker.RemovalNotification;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * The concurrent hash map implementation built by {@link MapMaker}.
@@ -2034,7 +2034,7 @@ class MapMakerInternalMap<K, V>
 
     /**
      * The table is expanded when its size exceeds this threshold. (The value of this field is
-     * always {@code (int)(capacity * 0.75)}.)
+     * always {@code (int) (capacity * 0.75)}.)
      */
     int threshold;
 
@@ -3603,6 +3603,7 @@ class MapMakerInternalMap<K, V>
       advance();
     }
 
+    @Override
     public abstract E next();
 
     final void advance() {
@@ -3676,6 +3677,7 @@ class MapMakerInternalMap<K, V>
       }
     }
 
+    @Override
     public boolean hasNext() {
       return nextExternal != null;
     }
@@ -3689,8 +3691,9 @@ class MapMakerInternalMap<K, V>
       return lastReturned;
     }
 
+    @Override
     public void remove() {
-      checkState(lastReturned != null);
+      checkRemove(lastReturned != null);
       MapMakerInternalMap.this.remove(lastReturned.getKey());
       lastReturned = null;
     }

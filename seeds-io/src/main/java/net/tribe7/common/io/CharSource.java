@@ -18,22 +18,26 @@ package net.tribe7.common.io;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.collect.ImmutableList;
-import net.tribe7.common.collect.Lists;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.base.Splitter;
+import net.tribe7.common.collect.AbstractIterator;
+import net.tribe7.common.collect.ImmutableList;
+import net.tribe7.common.collect.Lists;
 
 /**
  * A readable source of characters, such as a text file. Unlike a {@link Reader}, a
  * {@code CharSource} is not an open, stateful stream of characters that can be read and closed.
- * Instead, it is an immutable <i>supplier</i> of {@code InputStream} instances.
+ * Instead, it is an immutable <i>supplier</i> of {@code Reader} instances.
  *
  * <p>{@code CharSource} provides two kinds of methods:
  * <ul>
@@ -56,7 +60,7 @@ import javax.annotation.Nullable;
  * @since 14.0
  * @author Colin Decker
  */
-public abstract class CharSource {
+public abstract class CharSource implements InputSupplier<Reader> {
 
   /**
    * Opens a new {@link Reader} for reading from this source. This method should return a new,
@@ -67,6 +71,21 @@ public abstract class CharSource {
    * @throws IOException if an I/O error occurs in the process of opening the reader
    */
   public abstract Reader openStream() throws IOException;
+
+  /**
+   * This method is a temporary method provided for easing migration from suppliers to sources and
+   * sinks.
+   *
+   * @since 15.0
+   * @deprecated This method is only provided for temporary compatibility with the
+   *     {@link InputSupplier} interface and should not be called directly. Use {@link #openStream}
+   *     instead.
+   */
+  @Override
+  @Deprecated
+  public final Reader getInput() throws IOException {
+    return openStream();
+  }
 
   /**
    * Opens a new {@link BufferedReader} for reading from this source. This method should return a
@@ -187,6 +206,213 @@ public abstract class CharSource {
       throw closer.rethrow(e);
     } finally {
       closer.close();
+    }
+  }
+
+  /**
+   * Returns whether the source has zero chars. The default implementation is to open a stream and
+   * check for EOF.
+   *
+   * @throws IOException if an I/O error occurs
+   * @since 15.0
+   */
+  public boolean isEmpty() throws IOException {
+    Closer closer = Closer.create();
+    try {
+      Reader reader = closer.register(openStream());
+      return reader.read() == -1;
+    } catch (Throwable e) {
+      throw closer.rethrow(e);
+    } finally {
+      closer.close();
+    }
+  }
+
+  /**
+   * Concatenates multiple {@link CharSource} instances into a single source. Streams returned from
+   * the source will contain the concatenated data from the streams of the underlying sources.
+   *
+   * <p>Only one underlying stream will be open at a time. Closing the  concatenated stream will
+   * close the open underlying stream.
+   *
+   * @param sources the sources to concatenate
+   * @return a {@code CharSource} containing the concatenated data
+   * @since 15.0
+   */
+  public static CharSource concat(Iterable<? extends CharSource> sources) {
+    return new ConcatenatedCharSource(sources);
+  }
+
+  /**
+   * Concatenates multiple {@link CharSource} instances into a single source. Streams returned from
+   * the source will contain the concatenated data from the streams of the underlying sources.
+   *
+   * <p>Only one underlying stream will be open at a time. Closing the concatenated stream will
+   * close the open underlying stream.
+   *
+   * <p>Note: The input {@code Iterator} will be copied to an {@code ImmutableList} when this
+   * method is called. This will fail if the iterator is infinite and may cause problems if the
+   * iterator eagerly fetches data for each source when iterated (rather than producing sources
+   * that only load data through their streams). Prefer using the {@link #concat(Iterable)}
+   * overload if possible.
+   *
+   * @param sources the sources to concatenate
+   * @return a {@code CharSource} containing the concatenated data
+   * @throws NullPointerException if any of {@code sources} is {@code null}
+   * @since 15.0
+   */
+  public static CharSource concat(Iterator<? extends CharSource> sources) {
+    return concat(ImmutableList.copyOf(sources));
+  }
+
+  /**
+   * Concatenates multiple {@link CharSource} instances into a single source. Streams returned from
+   * the source will contain the concatenated data from the streams of the underlying sources.
+   *
+   * <p>Only one underlying stream will be open at a time. Closing the concatenated stream will
+   * close the open underlying stream.
+   *
+   * @param sources the sources to concatenate
+   * @return a {@code CharSource} containing the concatenated data
+   * @throws NullPointerException if any of {@code sources} is {@code null}
+   * @since 15.0
+   */
+  public static CharSource concat(CharSource... sources) {
+    return concat(ImmutableList.copyOf(sources));
+  }
+
+  /**
+   * Returns a view of the given character sequence as a {@link CharSource}. The behavior of the
+   * returned {@code CharSource} and any {@code Reader} instances created by it is unspecified if
+   * the {@code charSequence} is mutated while it is being read, so don't do that.
+   *
+   * @since 15.0 (since 14.0 as {@code CharStreams.asCharSource(String)})
+   */
+  public static CharSource wrap(CharSequence charSequence) {
+    return new CharSequenceCharSource(charSequence);
+  }
+
+  /**
+   * Returns an immutable {@link CharSource} that contains no characters.
+   *
+   * @since 15.0
+   */
+  public static CharSource empty() {
+    return EmptyCharSource.INSTANCE;
+  }
+
+  private static class CharSequenceCharSource extends CharSource {
+
+    private static final Splitter LINE_SPLITTER
+        = Splitter.on(Pattern.compile("\r\n|\n|\r"));
+
+    private final CharSequence seq;
+
+    protected CharSequenceCharSource(CharSequence seq) {
+      this.seq = checkNotNull(seq);
+    }
+
+    @Override
+    public Reader openStream() {
+      return new CharSequenceReader(seq);
+    }
+
+    @Override
+    public String read() {
+      return seq.toString();
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return seq.length() == 0;
+    }
+
+    /**
+     * Returns an iterable over the lines in the string. If the string ends in
+     * a newline, a final empty string is not included to match the behavior of
+     * BufferedReader/LineReader.readLine().
+     */
+    private Iterable<String> lines() {
+      return new Iterable<String>() {
+        @Override
+        public Iterator<String> iterator() {
+          return new AbstractIterator<String>() {
+            Iterator<String> lines = LINE_SPLITTER.split(seq).iterator();
+
+            @Override
+            protected String computeNext() {
+              if (lines.hasNext()) {
+                String next = lines.next();
+                // skip last line if it's empty
+                if (lines.hasNext() || !next.isEmpty()) {
+                  return next;
+                }
+              }
+              return endOfData();
+            }
+          };
+        }
+      };
+    }
+
+    @Override
+    public String readFirstLine() {
+      Iterator<String> lines = lines().iterator();
+      return lines.hasNext() ? lines.next() : null;
+    }
+
+    @Override
+    public ImmutableList<String> readLines() {
+      return ImmutableList.copyOf(lines());
+    }
+
+    @Override
+    public String toString() {
+      CharSequence shortened = (seq.length() <= 15) ? seq : seq.subSequence(0, 12) + "...";
+      return "CharSource.wrap(" + shortened + ")";
+    }
+  }
+
+  private static final class EmptyCharSource extends CharSequenceCharSource {
+
+    private static final EmptyCharSource INSTANCE = new EmptyCharSource();
+
+    private EmptyCharSource() {
+      super("");
+    }
+
+    @Override
+    public String toString() {
+      return "CharSource.empty()";
+    }
+  }
+
+  private static final class ConcatenatedCharSource extends CharSource {
+
+    private final Iterable<? extends CharSource> sources;
+
+    ConcatenatedCharSource(Iterable<? extends CharSource> sources) {
+      this.sources = checkNotNull(sources);
+    }
+
+    @Override
+    public Reader openStream() throws IOException {
+      return new MultiReader(sources.iterator());
+    }
+
+    @Override
+    public boolean isEmpty() throws IOException {
+      for (CharSource source : sources) {
+        if (!source.isEmpty()) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return "CharSource.concat(" + sources + ")";
     }
   }
 }

@@ -16,12 +16,12 @@
 
 package net.tribe7.common.base;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
 import java.util.Iterator;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 @GwtCompatible(serializable = true)
 final class PairwiseEquivalence<T> extends Equivalence<Iterable<T>>

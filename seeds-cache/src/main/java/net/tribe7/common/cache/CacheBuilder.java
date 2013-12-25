@@ -21,6 +21,16 @@ import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkState;
 
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
+import java.util.ConcurrentModificationException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.annotation.CheckReturnValue;
+
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.GwtCompatible;
 import net.tribe7.common.annotations.GwtIncompatible;
@@ -33,16 +43,6 @@ import net.tribe7.common.base.Ticker;
 import net.tribe7.common.cache.AbstractCache.SimpleStatsCounter;
 import net.tribe7.common.cache.AbstractCache.StatsCounter;
 import net.tribe7.common.cache.LocalCache.Strength;
-
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
-import java.util.ConcurrentModificationException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.annotation.CheckReturnValue;
 
 /**
  * <p>A builder of {@link LoadingCache} and {@link Cache} instances having any combination of the
@@ -59,7 +59,7 @@ import javax.annotation.CheckReturnValue;
  * <li>accumulation of cache access statistics
  * </ul>
  *
- * These features are all optional; caches can be created using all or none of them. By default
+ * <p>These features are all optional; caches can be created using all or none of them. By default
  * cache instances created by {@code CacheBuilder} will not perform any type of eviction.
  *
  * <p>Usage example: <pre>   {@code
@@ -75,7 +75,7 @@ import javax.annotation.CheckReturnValue;
  *             }
  *           });}</pre>
  *
- * Or equivalently, <pre>   {@code
+ * <p>Or equivalently, <pre>   {@code
  *
  *   // In real life this would come from a command-line flag or config file
  *   String spec = "maximumSize=10000,expireAfterWrite=10m";
@@ -116,7 +116,7 @@ import javax.annotation.CheckReturnValue;
  * <p>If {@linkplain #expireAfterWrite expireAfterWrite} or
  * {@linkplain #expireAfterAccess expireAfterAccess} is requested entries may be evicted on each
  * cache modification, on occasional cache accesses, or on calls to {@link Cache#cleanUp}. Expired
- * entries may be counted in {@link Cache#size}, but will never be visible to read or write
+ * entries may be counted by {@link Cache#size}, but will never be visible to read or write
  * operations.
  *
  * <p>If {@linkplain #weakKeys weakKeys}, {@linkplain #weakValues weakValues}, or
@@ -761,6 +761,10 @@ public final class CacheBuilder<K, V> {
   public CacheBuilder<K, V> recordStats() {
     statsCounterSupplier = CACHE_STATS_COUNTER;
     return this;
+  }
+  
+  boolean isRecordingStats() {
+    return statsCounterSupplier == CACHE_STATS_COUNTER;
   }
 
   Supplier<? extends StatsCounter> getStatsCounterSupplier() {

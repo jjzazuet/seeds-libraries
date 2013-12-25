@@ -18,13 +18,13 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Function;
-import net.tribe7.common.base.Objects;
-
 import java.io.Serializable;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.base.Objects;
 
 /**
  * An ordering that orders elements by applying an order to the result of a

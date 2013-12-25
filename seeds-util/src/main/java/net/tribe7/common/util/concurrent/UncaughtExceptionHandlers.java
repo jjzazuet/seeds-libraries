@@ -18,10 +18,10 @@ package net.tribe7.common.util.concurrent;
 
 import static java.util.logging.Level.SEVERE;
 
-import net.tribe7.common.annotations.VisibleForTesting;
-
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.logging.Logger;
+
+import net.tribe7.common.annotations.VisibleForTesting;
 
 /**
  * Factories for {@link UncaughtExceptionHandler} instances.
@@ -42,6 +42,9 @@ public final class UncaughtExceptionHandlers {
    *   Thread.currentThread().setUncaughtExceptionHandler(UncaughtExceptionHandlers.systemExit());
    *   ...
    * </pre>
+   *
+   * <p>The returned handler logs any exception at severity {@code SEVERE} and then shuts down the
+   * process with an exit status of 1, indicating abnormal termination.
    */
   public static UncaughtExceptionHandler systemExit() {
     return new Exiter(Runtime.getRuntime());

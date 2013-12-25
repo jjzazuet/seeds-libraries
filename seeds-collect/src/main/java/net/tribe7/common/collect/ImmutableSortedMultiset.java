@@ -17,9 +17,6 @@ package net.tribe7.common.collect;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtIncompatible;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +24,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * An immutable {@code SortedMultiset} that stores its elements in a sorted array. Some instances
@@ -55,7 +55,7 @@ import java.util.List;
  *
  *   {(x, y) | comparator.compare(x, y) == 0}}</pre>
  *
- * With natural ordering of elements, the following relation determines whether two elements are
+ * <p>With natural ordering of elements, the following relation determines whether two elements are
  * equivalent:
  *
  * <pre>   {@code
@@ -430,7 +430,7 @@ public abstract class ImmutableSortedMultiset<E> extends ImmutableSortedMultiset
    *           .addCopies(Bean.BLACK_EYED, 10)
    *           .build();}</pre>
    *
-   * Builder instances can be reused; it is safe to call {@link #build} multiple times to build
+   * <p>Builder instances can be reused; it is safe to call {@link #build} multiple times to build
    * multiple multisets in series.
    *
    * @since 12.0

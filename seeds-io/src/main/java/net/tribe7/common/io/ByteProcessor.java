@@ -16,9 +16,9 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.io.IOException;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A callback interface to process bytes from a stream.

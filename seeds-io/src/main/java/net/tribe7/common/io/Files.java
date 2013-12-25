@@ -20,14 +20,6 @@ import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.io.FileWriteMode.APPEND;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Charsets;
-import net.tribe7.common.base.Joiner;
-import net.tribe7.common.base.Splitter;
-import net.tribe7.common.collect.ImmutableSet;
-import net.tribe7.common.hash.HashCode;
-import net.tribe7.common.hash.HashFunction;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -48,8 +40,19 @@ import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.zip.Checksum;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Charsets;
+import net.tribe7.common.base.Joiner;
+import net.tribe7.common.base.Predicate;
+import net.tribe7.common.base.Splitter;
+import net.tribe7.common.collect.ImmutableSet;
+import net.tribe7.common.collect.Lists;
+import net.tribe7.common.collect.TreeTraverser;
+import net.tribe7.common.hash.HashCode;
+import net.tribe7.common.hash.HashFunction;
 
 /**
  * Provides utility methods for working with files.
@@ -164,23 +167,28 @@ public final class Files {
           off += read;
         }
 
-        byte[] result = bytes;
-
         if (off < size) {
           // encountered EOF early; truncate the result
-          result = Arrays.copyOf(bytes, off);
-        } else if (read != -1) {
-          // we read size bytes... if the last read didn't return -1, the file got larger
-          // so we just read the rest normally and then create a new array
-          ByteArrayOutputStream out = new ByteArrayOutputStream();
-          ByteStreams.copy(in, out);
-          byte[] moreBytes = out.toByteArray();
-          result = new byte[bytes.length + moreBytes.length];
-          System.arraycopy(bytes, 0, result, 0, bytes.length);
-          System.arraycopy(moreBytes, 0, result, bytes.length, moreBytes.length);
+          return Arrays.copyOf(bytes, off);
         }
-        // normally, off should == size and read should == -1
-        // in that case, the array is just returned as is
+
+        // otherwise, exactly size bytes were read
+
+        int b = in.read(); // check for EOF
+        if (b == -1) {
+          // EOF; the file did not change size, so return the original array
+          return bytes;
+        }
+
+        // the file got larger, so read the rest normally
+        InternalByteArrayOutputStream out
+            = new InternalByteArrayOutputStream();
+        out.write(b); // write the byte we read when testing for EOF
+        ByteStreams.copy(in, out);
+
+        byte[] result = new byte[bytes.length + out.size()];
+        System.arraycopy(bytes, 0, result, 0, bytes.length);
+        out.writeTo(result, bytes.length);
         return result;
       } catch (Throwable e) {
         throw closer.rethrow(e);
@@ -192,6 +200,20 @@ public final class Files {
     @Override
     public String toString() {
       return "Files.asByteSource(" + file + ")";
+    }
+  }
+
+  /**
+   * BAOS subclass for direct access to its internal buffer.
+   */
+  private static final class InternalByteArrayOutputStream
+      extends ByteArrayOutputStream {
+    /**
+     * Writes the contents of the internal buffer to the given array starting
+     * at the given offset. Assumes the array has space to hold count bytes.
+     */
+    void writeTo(byte[] b, int off) {
+      System.arraycopy(buf, 0, b, off, count);
     }
   }
 
@@ -679,6 +701,10 @@ public final class Files {
    * line-termination characters, but do include other leading and
    * trailing whitespace.
    *
+   * <p>This method returns a mutable {@code List}. For an
+   * {@code ImmutableList}, use
+   * {@code Files.asCharSource(file, charset).readLines()}.
+   *
    * @param file the file to read from
    * @param charset the charset used to decode the input stream; see {@link
    *     Charsets} for helpful predefined constants
@@ -687,7 +713,22 @@ public final class Files {
    */
   public static List<String> readLines(File file, Charset charset)
       throws IOException {
-    return CharStreams.readLines(Files.newReaderSupplier(file, charset));
+    // don't use asCharSource(file, charset).readLines() because that returns
+    // an immutable list, which would change the behavior of this method
+    return readLines(file, charset, new LineProcessor<List<String>>() {
+      final List<String> result = Lists.newArrayList();
+
+      @Override
+      public boolean processLine(String line) {
+        result.add(line);
+        return true;
+      }
+
+      @Override
+      public List<String> getResult() {
+        return result;
+      }
+    });
   }
 
   /**
@@ -720,25 +761,6 @@ public final class Files {
   public static <T> T readBytes(File file, ByteProcessor<T> processor)
       throws IOException {
     return ByteStreams.readBytes(newInputStreamSupplier(file), processor);
-  }
-
-  /**
-   * Computes and returns the checksum value for a file.
-   * The checksum object is reset when this method returns successfully.
-   *
-   * @param file the file to read
-   * @param checksum the checksum object
-   * @return the result of {@link Checksum#getValue} after updating the
-   *     checksum object with all of the bytes in the file
-   * @throws IOException if an I/O error occurs
-   * @deprecated Use {@code hash} with the {@code Hashing.crc32()} or
-   *     {@code Hashing.adler32()} hash functions. This method is scheduled
-   *     to be removed in Guava 15.0.
-   */
-  @Deprecated
-  public static long getChecksum(File file, Checksum checksum)
-      throws IOException {
-    return ByteStreams.getChecksum(newInputStreamSupplier(file), checksum);
   }
 
   /**
@@ -868,7 +890,7 @@ public final class Files {
    * <li>delete trailing slashes (unless the path is just "/")
    * </ul>
    *
-   * These heuristics do not always match the behavior of the filesystem. In
+   * <p>These heuristics do not always match the behavior of the filesystem. In
    * particular, consider the path {@code a/../b}, which {@code simplifyPath}
    * will change to {@code b}. If {@code a} is a symlink to {@code x}, {@code
    * a/../b} may refer to a sibling of {@code x}, rather than the sibling of
@@ -949,5 +971,83 @@ public final class Files {
     String fileName = new File(file).getName();
     int dotIndex = fileName.lastIndexOf('.');
     return (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
+  }
+
+  /**
+   * Returns a {@link TreeTraverser} instance for {@link File} trees.
+   *
+   * <p><b>Warning:</b> {@code File} provides no support for symbolic links, and as such there is no
+   * way to ensure that a symbolic link to a directory is not followed when traversing the tree.
+   * In this case, iterables created by this traverser could contain files that are outside of the
+   * given directory or even be infinite if there is a symbolic link loop.
+   *
+   * @since 15.0
+   */
+  public static TreeTraverser<File> fileTreeTraverser() {
+    return FILE_TREE_TRAVERSER;
+  }
+
+  private static final TreeTraverser<File> FILE_TREE_TRAVERSER = new TreeTraverser<File>() {
+    @Override
+    public Iterable<File> children(File file) {
+      // check isDirectory() just because it may be faster than listFiles() on a non-directory
+      if (file.isDirectory()) {
+        File[] files = file.listFiles();
+        if (files != null) {
+          return Collections.unmodifiableList(Arrays.asList(files));
+        }
+      }
+
+      return Collections.emptyList();
+    }
+
+    @Override
+    public String toString() {
+      return "Files.fileTreeTraverser()";
+    }
+  };
+
+  /**
+   * Returns a predicate that returns the result of {@link File#isDirectory} on input files.
+   *
+   * @since 15.0
+   */
+  public static Predicate<File> isDirectory() {
+    return FilePredicate.IS_DIRECTORY;
+  }
+
+  /**
+   * Returns a predicate that returns the result of {@link File#isFile} on input files.
+   *
+   * @since 15.0
+   */
+  public static Predicate<File> isFile() {
+    return FilePredicate.IS_FILE;
+  }
+
+  private enum FilePredicate implements Predicate<File> {
+    IS_DIRECTORY {
+      @Override
+      public boolean apply(File file) {
+        return file.isDirectory();
+      }
+
+      @Override
+      public String toString() {
+        return "Files.isDirectory()";
+      }
+    },
+
+    IS_FILE {
+      @Override
+      public boolean apply(File file) {
+        return file.isFile();
+      }
+
+      @Override
+      public String toString() {
+        return "Files.isFile()";
+      }
+    };
   }
 }

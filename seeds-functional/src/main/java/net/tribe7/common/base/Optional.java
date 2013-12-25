@@ -18,14 +18,14 @@ package net.tribe7.common.base;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * An immutable object that may contain a non-null reference to another object. Each
@@ -129,7 +129,7 @@ public abstract class Optional<T> implements Serializable {
    *   Optional<? extends Number> first = numbers.first();
    *   Number value = first.or(0.5); // error}</pre>
    *
-   * As a workaround, it is always safe to cast an {@code Optional<? extends T>} to {@code
+   * <p>As a workaround, it is always safe to cast an {@code Optional<? extends T>} to {@code
    * Optional<T>}. Casting either of the above example {@code Optional} instances to {@code
    * Optional<Number>} (where {@code Number} is the desired output type) solves the problem:
    * <pre>   {@code

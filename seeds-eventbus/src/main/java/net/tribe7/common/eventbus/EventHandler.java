@@ -18,12 +18,12 @@ package net.tribe7.common.eventbus;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.base.Preconditions;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.base.Preconditions;
 
 /**
  * Wraps a single-argument 'handler' method on a specific object.

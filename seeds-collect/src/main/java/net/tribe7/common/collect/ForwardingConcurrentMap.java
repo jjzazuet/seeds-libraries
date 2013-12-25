@@ -16,9 +16,9 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.concurrent.ConcurrentMap;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A concurrent map which forwards all its method calls to another concurrent

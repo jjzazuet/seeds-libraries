@@ -176,8 +176,8 @@
  *
  * <ul>
  * <li>{@link net.tribe7.common.collect.Range}
+ * <li>{@link net.tribe7.common.collect.RangeMap}
  * <li>{@link net.tribe7.common.collect.DiscreteDomain}
- * <li>{@link net.tribe7.common.collect.DiscreteDomains}
  * <li>{@link net.tribe7.common.collect.ContiguousSet}
  * </ul>
  *
@@ -216,6 +216,7 @@
  * <li>{@link net.tribe7.common.collect.ForwardingSet}
  * <li>{@link net.tribe7.common.collect.ForwardingSetMultimap}
  * <li>{@link net.tribe7.common.collect.ForwardingSortedMap}
+ * <li>{@link net.tribe7.common.collect.ForwardingSortedMultiset}
  * <li>{@link net.tribe7.common.collect.ForwardingSortedSet}
  * <li>{@link net.tribe7.common.collect.ForwardingSortedSetMultimap}
  * <li>{@link net.tribe7.common.collect.ForwardingTable}

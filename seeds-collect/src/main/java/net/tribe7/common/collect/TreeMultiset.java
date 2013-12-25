@@ -18,11 +18,7 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkState;
-
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.base.Objects;
-import net.tribe7.common.primitives.Ints;
+import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -34,6 +30,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.base.Objects;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * A multiset which maintains the ordering of its elements, according to either their natural order
@@ -430,7 +431,7 @@ public final class TreeMultiset<E> extends AbstractSortedMultiset<E> implements 
 
       @Override
       public void remove() {
-        checkState(prevEntry != null);
+        checkRemove(prevEntry != null);
         setCount(prevEntry.getElement(), 0);
         prevEntry = null;
       }
@@ -472,7 +473,7 @@ public final class TreeMultiset<E> extends AbstractSortedMultiset<E> implements 
 
       @Override
       public void remove() {
-        checkState(prevEntry != null);
+        checkRemove(prevEntry != null);
         setCount(prevEntry.getElement(), 0);
         prevEntry = null;
       }

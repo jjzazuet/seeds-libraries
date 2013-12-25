@@ -16,6 +16,11 @@
 
 package net.tribe7.common.math;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.copySign;
+import static java.lang.Math.getExponent;
+import static java.lang.Math.log;
+import static java.lang.Math.rint;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.math.DoubleUtils.IMPLICIT_BIT;
 import static net.tribe7.common.math.DoubleUtils.SIGNIFICAND_BITS;
@@ -26,17 +31,13 @@ import static net.tribe7.common.math.DoubleUtils.scaleNormalize;
 import static net.tribe7.common.math.MathPreconditions.checkInRange;
 import static net.tribe7.common.math.MathPreconditions.checkNonNegative;
 import static net.tribe7.common.math.MathPreconditions.checkRoundingUnnecessary;
-import static java.lang.Math.abs;
-import static java.lang.Math.copySign;
-import static java.lang.Math.getExponent;
-import static java.lang.Math.log;
-import static java.lang.Math.rint;
-
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.primitives.Booleans;
 
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Iterator;
+
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.primitives.Booleans;
 
 /**
  * A class for arithmetic on doubles that is not covered by {@link java.lang.Math}.
@@ -342,7 +343,7 @@ public final class DoubleMath {
           Math.copySign(a - b, 1.0) <= tolerance
            // copySign(x, 1.0) is a branch-free version of abs(x), but with different NaN semantics
           || (a == b) // needed to ensure that infinities equal themselves
-          || ((a != a) && (b != b)); // x != x is equivalent to Double.isNaN(x), but faster
+          || (Double.isNaN(a) && Double.isNaN(b));
   }
 
   /**
@@ -369,6 +370,87 @@ public final class DoubleMath {
     } else {
       return Booleans.compare(Double.isNaN(a), Double.isNaN(b));
     }
+  }
+
+  private static final class MeanAccumulator {
+
+    private long count = 0;
+    private double mean = 0.0;
+
+    void add(double value) {
+      checkArgument(isFinite(value));
+      ++count;
+      // Art of Computer Programming vol. 2, Knuth, 4.2.2, (15)
+      mean += (value - mean) / count;
+    }
+
+    double mean() {
+      checkArgument(count > 0, "Cannot take mean of 0 values");
+      return mean;
+    }
+  }
+
+  /**
+   * Returns the arithmetic mean of the values. There must be at least one value, and they must all
+   * be finite.
+   */
+  public static double mean(double... values) {
+    MeanAccumulator accumulator = new MeanAccumulator();
+    for (double value : values) {
+      accumulator.add(value);
+    }
+    return accumulator.mean();
+  }
+
+  /**
+   * Returns the arithmetic mean of the values. There must be at least one value. The values will
+   * be converted to doubles, which does not cause any loss of precision for ints.
+   */
+  public static double mean(int... values) {
+    MeanAccumulator accumulator = new MeanAccumulator();
+    for (int value : values) {
+      accumulator.add(value);
+    }
+    return accumulator.mean();
+  }
+
+  /**
+   * Returns the arithmetic mean of the values. There must be at least one value. The values will
+   * be converted to doubles, which causes loss of precision for longs of magnitude over 2^53
+   * (slightly over 9e15).
+   */
+  public static double mean(long... values) {
+    MeanAccumulator accumulator = new MeanAccumulator();
+    for (long value : values) {
+      accumulator.add(value);
+    }
+    return accumulator.mean();
+  }
+
+  /**
+   * Returns the arithmetic mean of the values. There must be at least one value, and they must all
+   * be finite. The values will be converted to doubles, which may cause loss of precision for some
+   * numeric types.
+   */
+  public static double mean(Iterable<? extends Number> values) {
+    MeanAccumulator accumulator = new MeanAccumulator();
+    for (Number value : values) {
+      accumulator.add(value.doubleValue());
+    }
+    return accumulator.mean();
+  }
+
+  /**
+   * Returns the arithmetic mean of the values. There must be at least one value, and they must all
+   * be finite. The values will be converted to doubles, which may cause loss of precision for some
+   * numeric types.
+   */
+  public static double mean(Iterator<? extends Number> values) {
+    MeanAccumulator accumulator = new MeanAccumulator();
+    while (values.hasNext()) {
+      accumulator.add(values.next().doubleValue());
+    }
+    return accumulator.mean();
   }
 
   private DoubleMath() {}

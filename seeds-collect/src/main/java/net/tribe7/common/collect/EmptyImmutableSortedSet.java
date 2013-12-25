@@ -16,15 +16,15 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * An empty immutable sorted set.
@@ -72,12 +72,9 @@ class EmptyImmutableSortedSet<E> extends ImmutableSortedSet<E> {
     return ImmutableList.of();
   }
 
-  @Override public Object[] toArray() {
-    return ObjectArrays.EMPTY_ARRAY;
-  }
-
-  @Override public <T> T[] toArray(T[] a) {
-    return asList().toArray(a);
+  @Override
+  int copyIntoArray(Object[] dst, int offset) {
+    return offset;
   }
 
   @Override public boolean equals(@Nullable Object object) {

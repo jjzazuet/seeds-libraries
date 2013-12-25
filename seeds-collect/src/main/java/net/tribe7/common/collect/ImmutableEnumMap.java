@@ -17,13 +17,13 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Iterator;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Implementation of {@link ImmutableMap} backed by a non-empty {@link

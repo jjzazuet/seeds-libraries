@@ -16,11 +16,11 @@ package net.tribe7.common.hash;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 
-import net.tribe7.common.math.LongMath;
-import net.tribe7.common.primitives.Ints;
-
 import java.math.RoundingMode;
 import java.util.Arrays;
+
+import net.tribe7.common.math.LongMath;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * Collections of strategies of generating the k * log(M) bits required for an element to
@@ -51,7 +51,7 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
         if (nextHash < 0) {
           nextHash = ~nextHash;
         }
-        bitsChanged |= bits.set(nextHash % bits.size());
+        bitsChanged |= bits.set(nextHash % bits.bitSize());
       }
       return bitsChanged;
     }
@@ -66,7 +66,7 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
         if (nextHash < 0) {
           nextHash = ~nextHash;
         }
-        if (!bits.get(nextHash % bits.size())) {
+        if (!bits.get(nextHash % bits.bitSize())) {
           return false;
         }
       }
@@ -109,7 +109,7 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
     }
 
     /** Number of bits */
-    int size() {
+    int bitSize() {
       return data.length * Long.SIZE;
     }
 
@@ -120,6 +120,17 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
 
     BitArray copy() {
       return new BitArray(data.clone());
+    }
+
+    /** Combines the two BitArrays using bitwise OR. */
+    void putAll(BitArray array) {
+      checkArgument(data.length == array.data.length,
+          "BitArrays must be of equal length (%s != %s)", data.length, array.data.length);
+      bitCount = 0;
+      for (int i = 0; i < data.length; i++) {
+        data[i] |= array.data[i];
+        bitCount += Long.bitCount(data[i]);
+      }
     }
 
     @Override public boolean equals(Object o) {

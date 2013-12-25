@@ -18,13 +18,13 @@ import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.collect.BoundType.CLOSED;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-
 import java.io.Serializable;
 import java.util.Collection;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * An implementation of {@link ContiguousSet} that contains one or more elements.
@@ -132,16 +132,6 @@ final class RegularContiguousSet<C extends Comparable> extends ContiguousSet<C> 
 
   @Override public boolean isEmpty() {
     return false;
-  }
-
-  // copied to make sure not to use the GWT-emulated version
-  @Override public Object[] toArray() {
-    return ObjectArrays.toArrayImpl(this);
-  }
-
-  // copied to make sure not to use the GWT-emulated version
-  @Override public <T> T[] toArray(T[] other) {
-    return ObjectArrays.toArrayImpl(this, other);
   }
 
   @Override public ContiguousSet<C> intersection(ContiguousSet<C> other) {

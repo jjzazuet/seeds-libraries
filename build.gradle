@@ -7,7 +7,7 @@ subprojects {
 	apply plugin: 'eclipse'
 
 	group = 'net.tribe7.seeds'
-	version = '14.0.1'
+	version = '15.0'
 	sourceCompatibility = 1.6
 
 	def releaseBuild = true
@@ -21,9 +21,9 @@ subprojects {
 		test.runtimeClasspath += configurations.provided
 	}
 
-	dependencies {
-		provided 'com.google.code.findbugs:jsr305:2.0.1'
-	}
+	dependencies { provided 'com.google.code.findbugs:jsr305:2.0.1' }
+	compileJava.options.encoding = 'UTF-8'	
+	javadoc.options.encoding = 'UTF-8'	
 
 	eclipse {
 		classpath {
@@ -34,9 +34,7 @@ subprojects {
 
 	jar { manifest.attributes provider: 'tribe7.net' }
 
-	javadoc {
-		classpath += configurations.provided
-	}
+	javadoc { classpath += configurations.provided }
 
 	task sourcesJar(type: Jar, dependsOn:classes) {
 		classifier = 'sources'
@@ -54,9 +52,7 @@ subprojects {
 		archives javadocJar
 	}
 
-	signing {
-		sign configurations.archives
-	}
+	signing { sign configurations.archives }
 
 	tasks.withType(Zip) { 
 		task -> task.doLast {

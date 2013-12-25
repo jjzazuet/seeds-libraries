@@ -16,11 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.SortedMap;
 import java.util.SortedSet;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Basic implementation of a {@link SortedSetMultimap} with a sorted key set.

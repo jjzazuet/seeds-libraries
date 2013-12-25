@@ -19,10 +19,6 @@ package net.tribe7.common.collect;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.base.Function;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,24 +36,45 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.base.Function;
+
 /**
  * A comparator, with additional methods to support common operations. This is
  * an "enriched" version of {@code Comparator}, in the same sense that {@link
- * FluentIterable} is an enriched {@link Iterable}). For example: <pre>   {@code
+ * FluentIterable} is an enriched {@link Iterable}.
  *
- *   if (Ordering.from(comparator).reverse().isOrdered(list)) { ... }}</pre>
+ * <p>The common ways to get an instance of {@code Ordering} are:
  *
- * The {@link #from(Comparator)} method returns the equivalent {@code Ordering}
- * instance for a pre-existing comparator. You can also skip the comparator step
- * and extend {@code Ordering} directly: <pre>   {@code
+ * <ul>
+ * <li>Subclass it and implement {@link #compare} instead of implementing
+ *     {@link Comparator} directly
+ * <li>Pass a <i>pre-existing</i> {@link Comparator} instance to {@link
+ *     #from(Comparator)}
+ * <li>Use the natural ordering, {@link Ordering#natural}
+ * </ul>
  *
- *   Ordering<String> byLengthOrdering = new Ordering<String>() {
- *     public int compare(String left, String right) {
- *       return Ints.compare(left.length(), right.length());
- *     }
- *   };}</pre>
+ * <p>Then you can use the <i>chaining</i> methods to get an altered version of
+ * that {@code Ordering}, including:
  *
- * Except as noted, the orderings returned by the factory methods of this
+ * <ul>
+ * <li>{@link #reverse}
+ * <li>{@link #compound(Comparator)}
+ * <li>{@link #onResultOf(Function)}
+ * <li>{@link #nullsFirst} / {@link #nullsLast}
+ * </ul>
+ *
+ * <p>Finally, use the resulting {@code Ordering} anywhere a {@link Comparator}
+ * is required, or use any of its special operations, such as:</p>
+ *
+ * <ul>
+ * <li>{@link #immutableSortedCopy}
+ * <li>{@link #isOrdered} / {@link #isStrictlyOrdered}
+ * <li>{@link #min} / {@link #max}
+ * </ul>
+ *
+ * <p>Except as noted, the orderings returned by the factory methods of this
  * class are serializable if and only if the provided instances that back them
  * are. For example, if {@code ordering} and {@code function} can themselves be
  * serialized, then {@code ordering.onResultOf(function)} can as well.
@@ -94,7 +111,7 @@ public abstract class Ordering<T> implements Comparator<T> {
   /**
    * Returns an ordering based on an <i>existing</i> comparator instance. Note
    * that there's no need to create a <i>new</i> comparator just to pass it in
-   * here; simply subclass {@code Ordering} and implement its {@code compareTo}
+   * here; simply subclass {@code Ordering} and implement its {@code compare}
    * method directly instead.
    *
    * @param comparator the comparator that defines the order
@@ -187,7 +204,7 @@ public abstract class Ordering<T> implements Comparator<T> {
    *   Ordering.allEqual().nullsLast().sortedCopy(
    *       asList(t, null, e, s, null, t, null))}</pre>
    *
-   * Assuming {@code t}, {@code e} and {@code s} are non-null, this returns
+   * <p>Assuming {@code t}, {@code e} and {@code s} are non-null, this returns
    * {@code [t, e, s, t, null, null, null]} regardlesss of the true comparison
    * order of those three values (which might not even implement {@link
    * Comparable} at all).
@@ -347,6 +364,10 @@ public abstract class Ordering<T> implements Comparator<T> {
   @GwtCompatible(serializable = true)
   public <F> Ordering<F> onResultOf(Function<F, ? extends T> function) {
     return new ByFunctionOrdering<F, T>(function, this);
+  }
+  
+  <T2 extends T> Ordering<Map.Entry<T2, ?>> onKeys() {
+    return onResultOf(Maps.<T2>keyFunction());
   }
 
   /**

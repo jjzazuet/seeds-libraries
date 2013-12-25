@@ -16,13 +16,13 @@
 
 package net.tribe7.common.net;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
-
 import java.net.InetAddress;
 import java.text.ParseException;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * A syntactically valid host specifier, suitable for use in a URI.

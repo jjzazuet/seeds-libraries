@@ -17,14 +17,15 @@
 package net.tribe7.common.util.concurrent;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
-
-import net.tribe7.common.annotations.Beta;
+import static net.tribe7.common.util.concurrent.Uninterruptibles.getUninterruptibly;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * Utilities necessary for working with libraries that supply plain {@link
@@ -69,7 +70,7 @@ public final class JdkFutureAdapters {
    * <p><b>Warning:</b> If the input future does not already implement {@code
    * ListenableFuture}, the returned future will emulate {@link
    * ListenableFuture#addListener} by submitting a task to the given executor at
-   * at the first call to {@code addListener}. The task must be started by the
+   * the first call to {@code addListener}. The task must be started by the
    * executor promptly, or else the returned {@code ListenableFuture} may fail
    * to work.  The task's execution consists of blocking until the input future
    * is {@linkplain Future#isDone() done}, so each call to this method may
@@ -160,13 +161,15 @@ public final class JdkFutureAdapters {
           @Override
           public void run() {
             try {
-              delegate.get();
+              /*
+               * Threads from our private pool are never interrupted. Threads
+               * from a user-supplied executor might be, but... what can we do?
+               * This is another reason to return a proper ListenableFuture
+               * instead of using listenInPoolThread.
+               */
+              getUninterruptibly(delegate);
             } catch (Error e) {
               throw e;
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-              // Threads from our private pool are never interrupted.
-              throw new AssertionError(e);
             } catch (Throwable e) {
               // ExecutionException / CancellationException / RuntimeException
               // The task is done, run the listeners.

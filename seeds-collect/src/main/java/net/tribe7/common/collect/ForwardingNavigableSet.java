@@ -16,11 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.SortedSet;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A navigable set which forwards all its method calls to another navigable set. Subclasses should

@@ -18,14 +18,14 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Supplier;
-
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Supplier;
 
 /**
  * Implementation of {@code Table} whose iteration ordering across row keys is
@@ -63,8 +63,6 @@ class StandardRowSortedTable<R, C, V> extends StandardTable<R, C, V>
     return (SortedMap<R, Map<C, V>>) backingMap;
   }
 
-  private transient SortedSet<R> rowKeySet;
-
   /**
    * {@inheritDoc}
    *
@@ -72,51 +70,8 @@ class StandardRowSortedTable<R, C, V> extends StandardTable<R, C, V>
    * specified in the {@link Table} interface.
    */
   @Override public SortedSet<R> rowKeySet() {
-    SortedSet<R> result = rowKeySet;
-    return (result == null) ? rowKeySet = new RowKeySortedSet() : result;
+    return (SortedSet<R>) rowMap().keySet();
   }
-
-  private class RowKeySortedSet extends RowKeySet implements SortedSet<R> {
-    @Override
-    public Comparator<? super R> comparator() {
-      return sortedBackingMap().comparator();
-    }
-
-    @Override
-    public R first() {
-      return sortedBackingMap().firstKey();
-    }
-
-    @Override
-    public R last() {
-      return sortedBackingMap().lastKey();
-    }
-
-    @Override
-    public SortedSet<R> headSet(R toElement) {
-      checkNotNull(toElement);
-      return new StandardRowSortedTable<R, C, V>(
-          sortedBackingMap().headMap(toElement), factory).rowKeySet();
-    }
-
-    @Override
-    public SortedSet<R> subSet(R fromElement, R toElement) {
-      checkNotNull(fromElement);
-      checkNotNull(toElement);
-      return new StandardRowSortedTable<R, C, V>(
-          sortedBackingMap().subMap(fromElement, toElement), factory)
-          .rowKeySet();
-    }
-
-    @Override
-    public SortedSet<R> tailSet(R fromElement) {
-      checkNotNull(fromElement);
-      return new StandardRowSortedTable<R, C, V>(
-          sortedBackingMap().tailMap(fromElement), factory).rowKeySet();
-    }
-  }
-
-  private transient RowSortedMap rowMap;
 
   /**
    * {@inheritDoc}
@@ -125,11 +80,25 @@ class StandardRowSortedTable<R, C, V> extends StandardTable<R, C, V>
    * specified in the {@link Table} interface.
    */
   @Override public SortedMap<R, Map<C, V>> rowMap() {
-    RowSortedMap result = rowMap;
-    return (result == null) ? rowMap = new RowSortedMap() : result;
+    return (SortedMap<R, Map<C, V>>) super.rowMap();
+  }
+
+  @Override
+  SortedMap<R, Map<C, V>> createRowMap() {
+    return new RowSortedMap();
   }
 
   private class RowSortedMap extends RowMap implements SortedMap<R, Map<C, V>> {
+    @Override
+    public SortedSet<R> keySet() {
+      return (SortedSet<R>) super.keySet();
+    }
+
+    @Override
+    SortedSet<R> createKeySet() {
+      return new Maps.SortedKeySet<R, Map<C, V>>(this);
+    }
+
     @Override
     public Comparator<? super R> comparator() {
       return sortedBackingMap().comparator();

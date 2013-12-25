@@ -16,14 +16,14 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Objects;
-
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * A map entry which forwards all its method calls to another map entry.

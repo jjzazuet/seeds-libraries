@@ -16,10 +16,10 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * Provides a backup {@code Future} to replace an earlier failed {@code Future}.

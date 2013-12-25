@@ -18,10 +18,6 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.annotations.VisibleForTesting;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,6 +26,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.annotations.VisibleForTesting;
 
 /**
  * Implementation of {@code Multimap} that uses an {@code ArrayList} to store

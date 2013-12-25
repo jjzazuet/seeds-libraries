@@ -16,13 +16,13 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.base.Preconditions;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.base.Preconditions;
 
 /**
  * A {@link Reader} that concatenates multiple readers.
@@ -31,11 +31,10 @@ import javax.annotation.Nullable;
  * @since 1.0
  */
 class MultiReader extends Reader {
-  private final Iterator<? extends InputSupplier<? extends Reader>> it;
+  private final Iterator<? extends CharSource> it;
   private Reader current;
 
-  MultiReader(Iterator<? extends InputSupplier<? extends Reader>> readers)
-      throws IOException {
+  MultiReader(Iterator<? extends CharSource> readers) throws IOException {
     this.it = readers;
     advance();
   }
@@ -46,7 +45,7 @@ class MultiReader extends Reader {
   private void advance() throws IOException {
     close();
     if (it.hasNext()) {
-      current = it.next().getInput();
+      current = it.next().openStream();
     }
   }
 

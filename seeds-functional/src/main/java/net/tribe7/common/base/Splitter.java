@@ -19,18 +19,20 @@ package net.tribe7.common.base;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.CheckReturnValue;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * Extracts non-overlapping substrings from an input string, typically by
@@ -61,7 +63,7 @@ import javax.annotation.CheckReturnValue;
  *       .trimResults()
  *       .omitEmptyStrings();}</pre>
  *
- * Now {@code MY_SPLITTER.split("foo,,,  bar ,")} returns just {@code ["foo",
+ * <p>Now {@code MY_SPLITTER.split("foo,,,  bar ,")} returns just {@code ["foo",
  * "bar"]}. Note that the order in which these configuration methods are called
  * is never significant.
  *
@@ -374,7 +376,8 @@ public final class Splitter {
 
   /**
    * Splits {@code sequence} into string components and makes them available
-   * through an {@link Iterator}, which may be lazily evaluated.
+   * through an {@link Iterator}, which may be lazily evaluated. If you want
+   * an eagerly computed {@link List}, use {@link #splitToList(CharSequence)}.
    *
    * @param sequence the sequence of characters to split
    * @return an iteration over the segments split from the parameter.
@@ -397,6 +400,29 @@ public final class Splitter {
 
   private Iterator<String> spliterator(CharSequence sequence) {
     return strategy.iterator(this, sequence);
+  }
+
+  /**
+   * Splits {@code sequence} into string components and returns them as
+   * an immutable list. If you want an {@link Iterable} which may be lazily
+   * evaluated, use {@link #split(CharSequence)}.
+   *
+   * @param sequence the sequence of characters to split
+   * @return an immutable list of the segments split from the parameter
+   * @since 15.0
+   */
+  @Beta
+  public List<String> splitToList(CharSequence sequence) {
+    checkNotNull(sequence);
+
+    Iterator<String> iterator = spliterator(sequence);
+    List<String> result = new ArrayList<String>();
+
+    while (iterator.hasNext()) {
+      result.add(iterator.next());
+    }
+
+    return Collections.unmodifiableList(result);
   }
 
   /**

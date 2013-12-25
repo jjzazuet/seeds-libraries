@@ -16,12 +16,12 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A delegating wrapper around a {@link ListenableFuture} that adds support for

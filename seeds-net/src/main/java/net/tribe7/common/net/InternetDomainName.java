@@ -20,18 +20,17 @@ import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkState;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.GwtCompatible;
 import net.tribe7.common.base.Ascii;
 import net.tribe7.common.base.CharMatcher;
 import net.tribe7.common.base.Joiner;
-import net.tribe7.common.base.Objects;
 import net.tribe7.common.base.Splitter;
 import net.tribe7.common.collect.ImmutableList;
-
-import java.util.List;
-
-import javax.annotation.Nullable;
 
 /**
  * An immutable well-formed internet domain name, such as {@code com} or {@code
@@ -49,7 +48,7 @@ import javax.annotation.Nullable;
  * suffixes and addressable as hosts; {@code "uk.com"} is one example. As a
  * result, the only useful test to determine if a domain is a plausible web host
  * is {@link #hasPublicSuffix()}. This will return {@code true} for many domains
- * which (currently) are not hosts, such as {@code "com"}), but given that any
+ * which (currently) are not hosts, such as {@code "com"}, but given that any
  * public suffix may become a host without warning, it is better to err on the
  * side of permissiveness and thus avoid spurious rejection of valid sites.
  *
@@ -59,12 +58,12 @@ import javax.annotation.Nullable;
  * <li>Unicode dot separators other than the ASCII period ({@code '.'}) are
  * converted to the ASCII period.
  * </ol>
- * The normalized values will be returned from {@link #name()} and
+ * <p>The normalized values will be returned from {@link #name()} and
  * {@link #parts()}, and will be reflected in the result of
  * {@link #equals(Object)}.
  *
  * <p><a href="http://en.wikipedia.org/wiki/Internationalized_domain_name">
- * internationalized domain names</a> such as {@code 网络.cn} are supported, as
+ * Internationalized domain names</a> such as {@code 网络.cn} are supported, as
  * are the equivalent <a
  * href="http://en.wikipedia.org/wiki/Internationalized_domain_name">IDNA
  * Punycode-encoded</a> versions.
@@ -313,10 +312,13 @@ public final class InternetDomainName {
   }
 
   /**
-   * Returns the domain name, normalized to all lower case.
+   * A deprecated synonym for {@link #toString()}.
+   *
+   * @deprecated Use {@link #toString()}
    */
+  @Deprecated
   public String name() {
-    return name;
+    return toString();
   }
 
   /**
@@ -493,17 +495,6 @@ public final class InternetDomainName {
   }
 
   /**
-   * A deprecated synonym for {@link #isValid(String)}.
-   *
-   * @since 8.0 (previously named {@code isValid})
-   * @deprecated Use {@link #isValid(String)} instead
-   */
-  @Deprecated
-  public static boolean isValidLenient(String name) {
-    return isValid(name);
-  }
-
-  /**
    * Indicates whether the argument is a syntactically valid domain name using
    * lenient validation. Specifically, validation against <a
    * href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>
@@ -512,14 +503,11 @@ public final class InternetDomainName {
    * <p>The following two code snippets are equivalent:
    *
    * <pre>   {@code
-   *
    *   domainName = InternetDomainName.isValid(name)
    *       ? InternetDomainName.from(name)
-   *       : DEFAULT_DOMAIN;
-   *   }</pre>
+   *       : DEFAULT_DOMAIN;}</pre>
    *
    * <pre>   {@code
-   *
    *   try {
    *     domainName = InternetDomainName.from(name);
    *   } catch (IllegalArgumentException e) {
@@ -546,10 +534,12 @@ public final class InternetDomainName {
     return pieces.length == 2 && TldPatterns.UNDER.contains(pieces[1]);
   }
 
-  // TODO: specify this to return the same as name(); remove name()
+  /**
+   * Returns the domain name, normalized to all lower case.
+   */
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("name", name).toString();
+    return name;
   }
 
   /**

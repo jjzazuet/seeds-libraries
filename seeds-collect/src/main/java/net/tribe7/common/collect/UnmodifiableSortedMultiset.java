@@ -16,11 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.collect.Multisets.UnmodifiableMultiset;
-
 import java.util.Comparator;
 import java.util.NavigableSet;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.collect.Multisets.UnmodifiableMultiset;
 
 /**
  * Implementation of {@link Multisets#unmodifiableSortedMultiset(SortedMultiset)},

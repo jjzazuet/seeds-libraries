@@ -17,12 +17,12 @@ package net.tribe7.common.primitives;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Static utility methods pertaining to {@code long} primitives that interpret values as

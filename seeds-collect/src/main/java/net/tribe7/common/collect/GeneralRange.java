@@ -19,13 +19,13 @@ import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.collect.BoundType.CLOSED;
 import static net.tribe7.common.collect.BoundType.OPEN;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Objects;
-
 import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * A generalized interval on any ordering, for internal use. Supports {@code null}. Unlike

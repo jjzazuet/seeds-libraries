@@ -16,8 +16,6 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +23,8 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Basic implementation of the {@link SortedSetMultimap} interface. It's a

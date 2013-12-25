@@ -16,9 +16,9 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.SortedMap;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * An object representing the differences between two sorted maps.

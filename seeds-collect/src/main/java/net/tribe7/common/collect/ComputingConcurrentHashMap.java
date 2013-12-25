@@ -17,11 +17,6 @@ package net.tribe7.common.collect;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkState;
 
-import net.tribe7.common.base.Equivalence;
-import net.tribe7.common.base.Function;
-import net.tribe7.common.collect.MapMaker.RemovalCause;
-import net.tribe7.common.collect.MapMaker.RemovalListener;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -32,6 +27,11 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
+
+import net.tribe7.common.base.Equivalence;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.collect.MapMaker.RemovalCause;
+import net.tribe7.common.collect.MapMaker.RemovalListener;
 
 /**
  * Adds computing functionality to {@link MapMakerInternalMap}.

@@ -16,9 +16,9 @@
 
 package net.tribe7.common.base;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Determines a true or false value for a given input.

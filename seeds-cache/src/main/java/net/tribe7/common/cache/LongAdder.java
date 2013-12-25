@@ -11,13 +11,13 @@
 
 package net.tribe7.common.cache;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
-import java.util.concurrent.atomic.AtomicLong;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicLong;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * One or more variables that together maintain an initially zero

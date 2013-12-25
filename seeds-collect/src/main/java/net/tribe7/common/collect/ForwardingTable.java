@@ -16,11 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A table which forwards all its method calls to another table. Subclasses

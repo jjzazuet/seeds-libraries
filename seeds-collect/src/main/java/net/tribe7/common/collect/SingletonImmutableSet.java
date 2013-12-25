@@ -16,12 +16,12 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Preconditions;
-
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * Implementation of {@link ImmutableSet} with exactly one element.
@@ -74,20 +74,10 @@ final class SingletonImmutableSet<E> extends ImmutableSet<E> {
     return false;
   }
 
-  @Override public Object[] toArray() {
-    return new Object[] { element };
-  }
-
-  @Override public <T> T[] toArray(T[] array) {
-    if (array.length == 0) {
-      array = ObjectArrays.newArray(array, 1);
-    } else if (array.length > 1) {
-      array[1] = null;
-    }
-    // Writes will produce ArrayStoreException when the toArray() doc requires.
-    Object[] objectArray = array;
-    objectArray[0] = element;
-    return array;
+  @Override
+  int copyIntoArray(Object[] dst, int offset) {
+    dst[offset] = element;
+    return offset + 1;
   }
 
   @Override public boolean equals(@Nullable Object object) {

@@ -16,8 +16,6 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -25,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A collection that supports order-independent equality, like {@link Set}, but
@@ -307,7 +307,7 @@ public interface Multiset<E> extends Collection<E> {
    *
    *   ((element == null) ? 0 : element.hashCode()) ^ count(element)}</pre>
    *
-   * over all distinct elements in the multiset. It follows that a multiset and
+   * <p>over all distinct elements in the multiset. It follows that a multiset and
    * its entry set always have the same hash code.
    */
   @Override

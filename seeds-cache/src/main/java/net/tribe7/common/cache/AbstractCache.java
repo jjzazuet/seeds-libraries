@@ -16,15 +16,15 @@
 
 package net.tribe7.common.cache;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.collect.ImmutableMap;
-import net.tribe7.common.collect.Maps;
-
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.collect.ImmutableMap;
+import net.tribe7.common.collect.Maps;
 
 /**
  * This class provides a skeletal implementation of the {@code Cache} interface to minimize the

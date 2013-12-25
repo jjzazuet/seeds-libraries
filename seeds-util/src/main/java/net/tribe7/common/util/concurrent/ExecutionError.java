@@ -16,9 +16,9 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * {@link Error} variant of {@link java.util.concurrent.ExecutionException}. As

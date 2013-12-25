@@ -16,15 +16,15 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.VisibleForTesting;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.VisibleForTesting;
 
 /**
  * Utility methods for working with {@link Closeable} objects.

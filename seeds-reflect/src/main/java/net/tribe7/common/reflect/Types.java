@@ -20,14 +20,6 @@ import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.collect.Iterables.transform;
 
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.base.Function;
-import net.tribe7.common.base.Joiner;
-import net.tribe7.common.base.Objects;
-import net.tribe7.common.base.Predicates;
-import net.tribe7.common.collect.ImmutableList;
-import net.tribe7.common.collect.Iterables;
-
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -38,8 +30,17 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.base.Joiner;
+import net.tribe7.common.base.Objects;
+import net.tribe7.common.base.Predicates;
+import net.tribe7.common.collect.ImmutableList;
+import net.tribe7.common.collect.Iterables;
 
 /**
  * Utilities for working with {@link Type}.
@@ -180,17 +181,22 @@ final class Types {
 
   @Nullable static Type getComponentType(Type type) {
     checkNotNull(type);
-    if (type instanceof Class) {
-      return ((Class<?>) type).getComponentType();
-    } else if (type instanceof GenericArrayType) {
-      return ((GenericArrayType) type).getGenericComponentType();
-    } else if (type instanceof WildcardType) {
-      return subtypeOfComponentType(((WildcardType) type).getUpperBounds());
-    } else if (type instanceof TypeVariable) {
-      return subtypeOfComponentType(((TypeVariable<?>) type).getBounds());
-    } else {
-      return null;
-    }
+    final AtomicReference<Type> result = new AtomicReference<Type>();
+    new TypeVisitor() {
+      @Override void visitTypeVariable(TypeVariable<?> t) {
+        result.set(subtypeOfComponentType(t.getBounds()));
+      }
+      @Override void visitWildcardType(WildcardType t) {
+        result.set(subtypeOfComponentType(t.getUpperBounds()));
+      }
+      @Override void visitGenericArrayType(GenericArrayType t) {
+        result.set(t.getGenericComponentType());
+      }
+      @Override void visitClass(Class<?> t) {
+        result.set(t.getComponentType());
+      }
+    }.visit(type);
+    return result.get();
   }
 
   /**
@@ -213,33 +219,6 @@ final class Types {
       }
     }
     return null;
-  }
-
-  static boolean containsTypeVariable(@Nullable Type type) {
-    if (type instanceof TypeVariable) {
-      return true;
-    }
-    if (type instanceof GenericArrayType) {
-      return containsTypeVariable(((GenericArrayType) type).getGenericComponentType());
-    }
-    if (type instanceof ParameterizedType) {
-      return containsTypeVariable(((ParameterizedType) type).getActualTypeArguments());
-    }
-    if (type instanceof WildcardType) {
-      WildcardType wildcard = (WildcardType) type;
-      return containsTypeVariable(wildcard.getUpperBounds())
-          || containsTypeVariable(wildcard.getLowerBounds());
-    }
-    return false;
-  }
-
-  private static boolean containsTypeVariable(Type[] types) {
-    for (Type paramType : types) {
-      if (containsTypeVariable(paramType)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private static final class GenericArrayTypeImpl

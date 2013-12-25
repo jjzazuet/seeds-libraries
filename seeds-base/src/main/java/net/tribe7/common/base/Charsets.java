@@ -16,10 +16,10 @@
 
 package net.tribe7.common.base;
 
+import java.nio.charset.Charset;
+
 import net.tribe7.common.annotations.GwtCompatible;
 import net.tribe7.common.annotations.GwtIncompatible;
-
-import java.nio.charset.Charset;
 
 /**
  * Contains constant definitions for the six standard {@link Charset} instances, which are

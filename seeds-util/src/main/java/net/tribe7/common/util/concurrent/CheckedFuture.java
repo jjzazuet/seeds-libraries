@@ -16,13 +16,13 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A {@code CheckedFuture} is a {@link ListenableFuture} that includes versions
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException;
  * <p>Implementations of this interface must adapt the exceptions thrown by
  * {@code Future#get()}: {@link CancellationException},
  * {@link ExecutionException} and {@link InterruptedException} into the type
- * specified by the {@code E} type parameter.
+ * specified by the {@code X} type parameter.
  *
  * <p>This interface also extends the ListenableFuture interface to allow
  * listeners to be added. This allows the future to be used as a normal

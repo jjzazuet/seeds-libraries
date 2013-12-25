@@ -16,17 +16,17 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
-import net.tribe7.common.primitives.Ints;
-import net.tribe7.common.primitives.Longs;
-
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
+import net.tribe7.common.primitives.Ints;
+import net.tribe7.common.primitives.Longs;
 
 /**
  * An implementation of {@link DataInput} that uses little-endian byte ordering

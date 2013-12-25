@@ -1,7 +1,8 @@
 rootProject.name = 'seeds-libraries'
 
 include 'seeds-base', 
-	'seeds-functional', 
+	'seeds-functional',
+	'seeds-escape',
 	'seeds-primitives',
 	'seeds-math',
 	'seeds-reflect',
@@ -11,4 +12,6 @@ include 'seeds-base',
 	'seeds-hash',
 	'seeds-eventbus',
 	'seeds-io',
-	'seeds-net'
+	'seeds-net',
+	'seeds-html',
+	'seeds-xml'

@@ -16,12 +16,12 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.io.Flushable;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * Utility methods for working with {@link Flushable} objects.

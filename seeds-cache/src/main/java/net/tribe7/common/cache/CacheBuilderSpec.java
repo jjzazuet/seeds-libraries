@@ -18,6 +18,11 @@ package net.tribe7.common.cache;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
+
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.VisibleForTesting;
 import net.tribe7.common.base.Objects;
@@ -25,11 +30,6 @@ import net.tribe7.common.base.Splitter;
 import net.tribe7.common.cache.LocalCache.Strength;
 import net.tribe7.common.collect.ImmutableList;
 import net.tribe7.common.collect.ImmutableMap;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
 
 /**
  * A specification of a {@link CacheBuilder} configuration.
@@ -50,9 +50,10 @@ import javax.annotation.Nullable;
  * <li>{@code weakKeys}: sets {@link CacheBuilder#weakKeys}.
  * <li>{@code softValues}: sets {@link CacheBuilder#softValues}.
  * <li>{@code weakValues}: sets {@link CacheBuilder#weakValues}.
+ * <li>{@code recordStats}: sets {@link CacheBuilder#recordStats}.
  * </ul>
  *
- * The set of supported keys will grow as {@code CacheBuilder} evolves, but existing keys
+ * <p>The set of supported keys will grow as {@code CacheBuilder} evolves, but existing keys
  * will never be removed.
  *
  * <p>Durations are represented by an integer, followed by one of "d", "h", "m",
@@ -100,6 +101,7 @@ public final class CacheBuilderSpec {
           .put("weakKeys", new KeyStrengthParser(Strength.WEAK))
           .put("softValues", new ValueStrengthParser(Strength.SOFT))
           .put("weakValues", new ValueStrengthParser(Strength.WEAK))
+          .put("recordStats", new RecordStatsParser())
           .put("expireAfterAccess", new AccessDurationParser())
           .put("expireAfterWrite", new WriteDurationParser())
           .put("refreshAfterWrite", new RefreshDurationParser())
@@ -112,6 +114,7 @@ public final class CacheBuilderSpec {
   @VisibleForTesting Integer concurrencyLevel;
   @VisibleForTesting Strength keyStrength;
   @VisibleForTesting Strength valueStrength;
+  @VisibleForTesting Boolean recordStats;
   @VisibleForTesting long writeExpirationDuration;
   @VisibleForTesting TimeUnit writeExpirationTimeUnit;
   @VisibleForTesting long accessExpirationDuration;
@@ -198,6 +201,9 @@ public final class CacheBuilderSpec {
           throw new AssertionError();
       }
     }
+    if (recordStats != null && recordStats) {
+      builder.recordStats();
+    }
     if (writeExpirationTimeUnit != null) {
       builder.expireAfterWrite(writeExpirationDuration, writeExpirationTimeUnit);
     }
@@ -239,6 +245,7 @@ public final class CacheBuilderSpec {
         concurrencyLevel,
         keyStrength,
         valueStrength,
+        recordStats,
         durationInNanos(writeExpirationDuration, writeExpirationTimeUnit),
         durationInNanos(accessExpirationDuration, accessExpirationTimeUnit),
         durationInNanos(refreshDuration, refreshTimeUnit));
@@ -259,6 +266,7 @@ public final class CacheBuilderSpec {
         && Objects.equal(concurrencyLevel, that.concurrencyLevel)
         && Objects.equal(keyStrength, that.keyStrength)
         && Objects.equal(valueStrength, that.valueStrength)
+        && Objects.equal(recordStats, that.recordStats)
         && Objects.equal(durationInNanos(writeExpirationDuration, writeExpirationTimeUnit),
             durationInNanos(that.writeExpirationDuration, that.writeExpirationTimeUnit))
         && Objects.equal(durationInNanos(accessExpirationDuration, accessExpirationTimeUnit),
@@ -382,6 +390,17 @@ public final class CacheBuilderSpec {
         "%s was already set to %s", key, spec.valueStrength);
 
       spec.valueStrength = strength;
+    }
+  }
+
+  /** Parse recordStats */
+  static class RecordStatsParser implements ValueParser {
+
+    @Override
+    public void parse(CacheBuilderSpec spec, String key, @Nullable String value) {
+      checkArgument(value == null, "recordStats does not take values");
+      checkArgument(spec.recordStats == null, "recordStats already set");
+      spec.recordStats = true;
     }
   }
 

@@ -16,9 +16,9 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.base.Preconditions;
-
 import java.util.concurrent.Executor;
+
+import net.tribe7.common.base.Preconditions;
 
 /**
  * A {@link ListenableFuture} which forwards all its method calls to another

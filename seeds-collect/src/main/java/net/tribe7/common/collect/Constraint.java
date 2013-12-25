@@ -18,6 +18,7 @@ package net.tribe7.common.collect;
 
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * A constraint that an element must satisfy in order to be added to a
@@ -32,7 +33,7 @@ import net.tribe7.common.annotations.GwtCompatible;
  *     return element;
  *   }}</pre>
  *
- * In order to be effective, constraints should be deterministic; that is,
+ * <p>In order to be effective, constraints should be deterministic; that is,
  * they should not depend on state that can change (such as external state,
  * random variables, and time) and should only depend on the value of the
  * passed-in element. A non-deterministic constraint cannot reliably enforce
@@ -43,10 +44,18 @@ import net.tribe7.common.annotations.GwtCompatible;
  * @see MapConstraint
  * @author Mike Bostock
  * @since 3.0
+ * @deprecated Use {@link Preconditions} for basic checks. In place of
+ *     constrained collections, we encourage you to check your preconditions
+ *     explicitly instead of leaving that work to the collection implementation.
+ *     For the specific case of rejecting null, consider the immutable
+ *     collections.
+ *     This interface is scheduled for removal in Guava 16.0.
  */
 @Beta
+@Deprecated
 @GwtCompatible
-public interface Constraint<E> {
+public
+interface Constraint<E> {
   /**
    * Throws a suitable {@code RuntimeException} if the specified element is
    * illegal. Typically this is either a {@link NullPointerException}, an

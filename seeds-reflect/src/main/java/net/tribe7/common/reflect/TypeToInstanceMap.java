@@ -16,11 +16,11 @@
 
 package net.tribe7.common.reflect;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A map, each entry of which maps a {@link TypeToken} to an instance of that type.

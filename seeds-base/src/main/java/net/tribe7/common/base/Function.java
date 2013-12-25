@@ -16,9 +16,9 @@
 
 package net.tribe7.common.base;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Determines an output value based on an input value.

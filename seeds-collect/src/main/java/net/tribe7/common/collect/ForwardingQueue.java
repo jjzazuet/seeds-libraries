@@ -16,10 +16,10 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.NoSuchElementException;
 import java.util.Queue;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A queue which forwards all its method calls to another queue. Subclasses

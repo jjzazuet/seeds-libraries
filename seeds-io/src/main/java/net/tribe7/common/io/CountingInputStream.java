@@ -16,13 +16,13 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * An {@link InputStream} that counts the number of bytes read.

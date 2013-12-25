@@ -17,11 +17,6 @@ package net.tribe7.common.collect;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.base.Objects;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -32,6 +27,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.base.Objects;
 
 /**
  * An implementation of {@link RangeSet} backed by a {@link TreeMap}.

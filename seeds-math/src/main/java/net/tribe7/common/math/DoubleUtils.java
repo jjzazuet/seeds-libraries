@@ -16,7 +16,6 @@
 
 package net.tribe7.common.math;
 
-import static net.tribe7.common.base.Preconditions.checkArgument;
 import static java.lang.Double.MAX_EXPONENT;
 import static java.lang.Double.MIN_EXPONENT;
 import static java.lang.Double.POSITIVE_INFINITY;
@@ -24,6 +23,7 @@ import static java.lang.Double.doubleToRawLongBits;
 import static java.lang.Double.isNaN;
 import static java.lang.Double.longBitsToDouble;
 import static java.lang.Math.getExponent;
+import static net.tribe7.common.base.Preconditions.checkArgument;
 
 import java.math.BigInteger;
 

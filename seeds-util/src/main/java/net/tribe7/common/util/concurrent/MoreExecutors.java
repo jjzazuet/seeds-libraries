@@ -19,12 +19,6 @@ package net.tribe7.common.util.concurrent;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.base.Throwables;
-import net.tribe7.common.collect.Lists;
-import net.tribe7.common.collect.Queues;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -48,6 +44,14 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.base.Supplier;
+import net.tribe7.common.base.Throwables;
+import net.tribe7.common.collect.Lists;
+import net.tribe7.common.collect.Queues;
+import net.tribe7.common.util.concurrent.ForwardingListenableFuture.SimpleForwardingListenableFuture;
 
 /**
  * Factory and utility methods for {@link java.util.concurrent.Executor}, {@link
@@ -422,11 +426,11 @@ public final class MoreExecutors {
    * {@code invokeAny}, are implemented in terms of calls to {@code
    * delegate.execute}. All other methods are forwarded unchanged to the
    * delegate. This implies that the returned {@code
-   * SchedulingListeningExecutorService} never calls the delegate's {@code
+   * ListeningScheduledExecutorService} never calls the delegate's {@code
    * submit}, {@code invokeAll}, and {@code invokeAny} methods, so any special
    * handling of tasks must be implemented in the delegate's {@code execute}
    * method or by wrapping the returned {@code
-   * SchedulingListeningExecutorService}.
+   * ListeningScheduledExecutorService}.
    *
    * <p>If the delegate executor was already an instance of {@code
    * ListeningScheduledExecutorService}, it is returned untouched, and the rest
@@ -443,7 +447,7 @@ public final class MoreExecutors {
 
   private static class ListeningDecorator
       extends AbstractListeningExecutorService {
-    final ExecutorService delegate;
+    private final ExecutorService delegate;
 
     ListeningDecorator(ExecutorService delegate) {
       this.delegate = checkNotNull(delegate);
@@ -492,28 +496,95 @@ public final class MoreExecutors {
     }
 
     @Override
-    public ScheduledFuture<?> schedule(
+    public ListenableScheduledFuture<?> schedule(
         Runnable command, long delay, TimeUnit unit) {
-      return delegate.schedule(command, delay, unit);
+      ListenableFutureTask<Void> task =
+          ListenableFutureTask.create(command, null);
+      ScheduledFuture<?> scheduled = delegate.schedule(task, delay, unit);
+      return new ListenableScheduledTask<Void>(task, scheduled);
     }
 
     @Override
-    public <V> ScheduledFuture<V> schedule(
+    public <V> ListenableScheduledFuture<V> schedule(
         Callable<V> callable, long delay, TimeUnit unit) {
-      return delegate.schedule(callable, delay, unit);
+      ListenableFutureTask<V> task = ListenableFutureTask.create(callable);
+      ScheduledFuture<?> scheduled = delegate.schedule(task, delay, unit);
+      return new ListenableScheduledTask<V>(task, scheduled);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(
+    public ListenableScheduledFuture<?> scheduleAtFixedRate(
         Runnable command, long initialDelay, long period, TimeUnit unit) {
-      return delegate.scheduleAtFixedRate(command, initialDelay, period, unit);
+      NeverSuccessfulListenableFutureTask task =
+          new NeverSuccessfulListenableFutureTask(command);
+      ScheduledFuture<?> scheduled =
+          delegate.scheduleAtFixedRate(task, initialDelay, period, unit);
+      return new ListenableScheduledTask<Void>(task, scheduled);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(
+    public ListenableScheduledFuture<?> scheduleWithFixedDelay(
         Runnable command, long initialDelay, long delay, TimeUnit unit) {
-      return delegate.scheduleWithFixedDelay(
-          command, initialDelay, delay, unit);
+      NeverSuccessfulListenableFutureTask task =
+          new NeverSuccessfulListenableFutureTask(command);
+      ScheduledFuture<?> scheduled =
+          delegate.scheduleWithFixedDelay(task, initialDelay, delay, unit);
+      return new ListenableScheduledTask<Void>(task, scheduled);
+    }
+
+    private static final class ListenableScheduledTask<V>
+        extends SimpleForwardingListenableFuture<V>
+        implements ListenableScheduledFuture<V> {
+
+      private final ScheduledFuture<?> scheduledDelegate;
+
+      public ListenableScheduledTask(
+          ListenableFuture<V> listenableDelegate,
+          ScheduledFuture<?> scheduledDelegate) {
+        super(listenableDelegate);
+        this.scheduledDelegate = scheduledDelegate;
+      }
+
+      @Override
+      public boolean cancel(boolean mayInterruptIfRunning) {
+        boolean cancelled = super.cancel(mayInterruptIfRunning);
+        if (cancelled) {
+          // Unless it is cancelled, the delegate may continue being scheduled
+          scheduledDelegate.cancel(mayInterruptIfRunning);
+
+          // TODO(user): Cancel "this" if "scheduledDelegate" is cancelled.
+        }
+        return cancelled;
+      }
+
+      @Override
+      public long getDelay(TimeUnit unit) {
+        return scheduledDelegate.getDelay(unit);
+      }
+
+      @Override
+      public int compareTo(Delayed other) {
+        return scheduledDelegate.compareTo(other);
+      }
+    }
+
+    private static final class NeverSuccessfulListenableFutureTask
+        extends AbstractFuture<Void>
+        implements Runnable {
+      private final Runnable delegate;
+
+      public NeverSuccessfulListenableFutureTask(Runnable delegate) {
+        this.delegate = checkNotNull(delegate);
+      }
+
+      @Override public void run() {
+        try {
+          delegate.run();
+        } catch (Throwable t) {
+          setException(t);
+          throw Throwables.propagate(t);
+        }
+      }
     }
   }
 
@@ -631,7 +702,7 @@ public final class MoreExecutors {
       return Executors.defaultThreadFactory();
     }
     try {
-      return (ThreadFactory) Class.forName("net.tribe7.appengine.api.ThreadManager")
+      return (ThreadFactory) Class.forName("com.google.appengine.api.ThreadManager")
           .getMethod("currentRequestThreadFactory")
           .invoke(null);
     } catch (IllegalAccessException e) {
@@ -646,12 +717,12 @@ public final class MoreExecutors {
   }
 
   private static boolean isAppEngine() {
-    if (System.getProperty("net.tribe7.appengine.runtime.environment") == null) {
+    if (System.getProperty("com.google.appengine.runtime.environment") == null) {
       return false;
     }
     try {
       // If the current environment is null, we're not inside AppEngine.
-      return Class.forName("net.tribe7.apphosting.api.ApiProxy")
+      return Class.forName("com.google.apphosting.api.ApiProxy")
           .getMethod("getCurrentEnvironment")
           .invoke(null) != null;
     } catch (ClassNotFoundException e) {
@@ -683,5 +754,91 @@ public final class MoreExecutors {
       // OK if we can't set the name in this environment.
     }
     return result;
+  }
+
+  // TODO(user): provide overloads for ListeningExecutorService? ListeningScheduledExecutorService?
+  // TODO(user): provide overloads that take constant strings? Function<Runnable, String>s to
+  // calculate names?
+
+  /**
+   * Creates an {@link Executor} that renames the {@link Thread threads} that its tasks run in.
+   *
+   * <p>The names are retrieved from the {@code nameSupplier} on the thread that is being renamed
+   * right before each task is run.  The renaming is best effort, if a {@link SecurityManager}
+   * prevents the renaming then it will be skipped but the tasks will still execute.
+   *
+   * @param executor The executor to decorate
+   * @param nameSupplier The source of names for each task
+   */
+  static Executor renamingDecorator(final Executor executor, final Supplier<String> nameSupplier) {
+    checkNotNull(executor);
+    checkNotNull(nameSupplier);
+    if (isAppEngine()) {
+      // AppEngine doesn't support thread renaming, so don't even try
+      return executor;
+    }
+    return new Executor() {
+      @Override public void execute(Runnable command) {
+        executor.execute(Callables.threadRenaming(command, nameSupplier));
+      }
+    };
+  }
+
+  /**
+   * Creates an {@link ExecutorService} that renames the {@link Thread threads} that its tasks run
+   * in.
+   *
+   * <p>The names are retrieved from the {@code nameSupplier} on the thread that is being renamed
+   * right before each task is run.  The renaming is best effort, if a {@link SecurityManager}
+   * prevents the renaming then it will be skipped but the tasks will still execute.
+   *
+   * @param service The executor to decorate
+   * @param nameSupplier The source of names for each task
+   */
+  static ExecutorService renamingDecorator(final ExecutorService service,
+      final Supplier<String> nameSupplier) {
+    checkNotNull(service);
+    checkNotNull(nameSupplier);
+    if (isAppEngine()) {
+      // AppEngine doesn't support thread renaming, so don't even try.
+      return service;
+    }
+    return new WrappingExecutorService(service) {
+      @Override protected <T> Callable<T> wrapTask(Callable<T> callable) {
+        return Callables.threadRenaming(callable, nameSupplier);
+      }
+      @Override protected Runnable wrapTask(Runnable command) {
+        return Callables.threadRenaming(command, nameSupplier);
+      }
+    };
+  }
+
+  /**
+   * Creates a {@link ScheduledExecutorService} that renames the {@link Thread threads} that its
+   * tasks run in.
+   *
+   * <p>The names are retrieved from the {@code nameSupplier} on the thread that is being renamed
+   * right before each task is run.  The renaming is best effort, if a {@link SecurityManager}
+   * prevents the renaming then it will be skipped but the tasks will still execute.
+   *
+   * @param service The executor to decorate
+   * @param nameSupplier The source of names for each task
+   */
+  static ScheduledExecutorService renamingDecorator(final ScheduledExecutorService service,
+      final Supplier<String> nameSupplier) {
+    checkNotNull(service);
+    checkNotNull(nameSupplier);
+    if (isAppEngine()) {
+      // AppEngine doesn't support thread renaming, so don't even try.
+      return service;
+    }
+    return new WrappingScheduledExecutorService(service) {
+      @Override protected <T> Callable<T> wrapTask(Callable<T> callable) {
+        return Callables.threadRenaming(callable, nameSupplier);
+      }
+      @Override protected Runnable wrapTask(Runnable command) {
+        return Callables.threadRenaming(command, nameSupplier);
+      }
+    };
   }
 }

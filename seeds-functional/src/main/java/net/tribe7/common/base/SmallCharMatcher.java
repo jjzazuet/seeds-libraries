@@ -16,11 +16,11 @@
 
 package net.tribe7.common.base;
 
+import java.util.BitSet;
+
 import net.tribe7.common.annotations.GwtIncompatible;
 import net.tribe7.common.annotations.VisibleForTesting;
 import net.tribe7.common.base.CharMatcher.FastMatcher;
-
-import java.util.BitSet;
 
 /**
  * An immutable version of CharMatcher for smallish sets of characters that uses a hash table

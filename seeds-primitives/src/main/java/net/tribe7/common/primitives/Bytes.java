@@ -21,8 +21,6 @@ import static net.tribe7.common.base.Preconditions.checkElementIndex;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkPositionIndexes;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -30,6 +28,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.RandomAccess;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Static utility methods pertaining to {@code byte} primitives, that are not

@@ -18,14 +18,14 @@ package net.tribe7.common.util.concurrent;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Function;
-import net.tribe7.common.collect.Maps;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.collect.Maps;
 
 /**
  * A map containing {@code long} values that can be atomically updated. While writes to a

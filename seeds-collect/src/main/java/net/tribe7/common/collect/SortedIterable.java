@@ -14,10 +14,10 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Comparator;
 import java.util.Iterator;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * An {@code Iterable} whose elements are sorted relative to a {@code Comparator}, typically

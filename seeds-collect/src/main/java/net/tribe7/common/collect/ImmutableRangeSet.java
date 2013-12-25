@@ -19,12 +19,6 @@ import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.collect.SortedLists.KeyAbsentBehavior.NEXT_LOWER;
 import static net.tribe7.common.collect.SortedLists.KeyPresentBehavior.ANY_PRESENT;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.collect.SortedLists.KeyAbsentBehavior;
-import net.tribe7.common.collect.SortedLists.KeyPresentBehavior;
-import net.tribe7.common.primitives.Ints;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
@@ -32,6 +26,12 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.collect.SortedLists.KeyAbsentBehavior;
+import net.tribe7.common.collect.SortedLists.KeyPresentBehavior;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * An efficient immutable implementation of a {@link RangeSet}.
@@ -384,7 +384,7 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
       if (result == null) {
         long total = 0;
         for (Range<C> range : ranges) {
-          total += range.asSet(domain).size();
+          total += ContiguousSet.create(range, domain).size();
           if (total >= Integer.MAX_VALUE) {
             break;
           }
@@ -404,7 +404,7 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
         protected C computeNext() {
           while (!elemItr.hasNext()) {
             if (rangeItr.hasNext()) {
-              elemItr = rangeItr.next().asSet(domain).iterator();
+              elemItr = ContiguousSet.create(rangeItr.next(), domain).iterator();
             } else {
               return endOfData();
             }
@@ -425,7 +425,7 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
         protected C computeNext() {
           while (!elemItr.hasNext()) {
             if (rangeItr.hasNext()) {
-              elemItr = rangeItr.next().asSet(domain).descendingIterator();
+              elemItr = ContiguousSet.create(rangeItr.next(), domain).descendingIterator();
             } else {
               return endOfData();
             }
@@ -482,9 +482,9 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
         long total = 0;
         for (Range<C> range : ranges) {
           if (range.contains(c)) {
-            return Ints.saturatedCast(total + range.asSet(domain).indexOf(c));
+            return Ints.saturatedCast(total + ContiguousSet.create(range, domain).indexOf(c));
           } else {
-            total += range.asSet(domain).size();
+            total += ContiguousSet.create(range, domain).size();
           }
         }
         throw new AssertionError("impossible");
@@ -522,6 +522,12 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
     }
   }
 
+  /**
+   * Returns {@code true} if this immutable range set's implementation contains references to
+   * user-created objects that aren't accessible via this range set's methods. This is generally
+   * used to determine whether {@code copyOf} implementations should make an explicit copy to avoid
+   * memory leaks.
+   */
   boolean isPartialView() {
     return ranges.isPartialView();
   }

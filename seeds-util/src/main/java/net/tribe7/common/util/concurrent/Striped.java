@@ -16,14 +16,7 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Functions;
-import net.tribe7.common.base.Preconditions;
-import net.tribe7.common.base.Supplier;
-import net.tribe7.common.collect.Iterables;
-import net.tribe7.common.collect.MapMaker;
-import net.tribe7.common.math.IntMath;
-import net.tribe7.common.primitives.Ints;
+import static net.tribe7.common.base.Objects.firstNonNull;
 
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -35,6 +28,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
+import net.tribe7.common.base.Supplier;
+import net.tribe7.common.collect.Iterables;
+import net.tribe7.common.collect.MapMaker;
+import net.tribe7.common.math.IntMath;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * A striped {@code Lock/Semaphore/ReadWriteLock}. This offers the underlying lock striping
@@ -164,8 +165,8 @@ public abstract class Striped<L> {
   // Static factories
 
   /**
-   * Creates a {@code Striped<Lock>} with eagerly initialized, strongly referenced locks, with the
-   * specified fairness. Every lock is reentrant.
+   * Creates a {@code Striped<Lock>} with eagerly initialized, strongly referenced locks.
+   * Every lock is reentrant.
    *
    * @param stripes the minimum number of stripes (locks) required
    * @return a new {@code Striped<Lock>}
@@ -179,8 +180,8 @@ public abstract class Striped<L> {
   }
 
   /**
-   * Creates a {@code Striped<Lock>} with lazily initialized, weakly referenced locks, with the
-   * specified fairness. Every lock is reentrant.
+   * Creates a {@code Striped<Lock>} with lazily initialized, weakly referenced locks.
+   * Every lock is reentrant.
    *
    * @param stripes the minimum number of stripes (locks) required
    * @return a new {@code Striped<Lock>}
@@ -195,7 +196,7 @@ public abstract class Striped<L> {
 
   /**
    * Creates a {@code Striped<Semaphore>} with eagerly initialized, strongly referenced semaphores,
-   * with the specified number of permits and fairness.
+   * with the specified number of permits.
    *
    * @param stripes the minimum number of stripes (semaphores) required
    * @param permits the number of permits in each semaphore
@@ -211,7 +212,7 @@ public abstract class Striped<L> {
 
   /**
    * Creates a {@code Striped<Semaphore>} with lazily initialized, weakly referenced semaphores,
-   * with the specified number of permits and fairness.
+   * with the specified number of permits.
    *
    * @param stripes the minimum number of stripes (semaphores) required
    * @param permits the number of permits in each semaphore
@@ -227,7 +228,7 @@ public abstract class Striped<L> {
 
   /**
    * Creates a {@code Striped<ReadWriteLock>} with eagerly initialized, strongly referenced
-   * read-write locks, with the specified fairness. Every lock is reentrant.
+   * read-write locks. Every lock is reentrant.
    *
    * @param stripes the minimum number of stripes (locks) required
    * @return a new {@code Striped<ReadWriteLock>}
@@ -238,7 +239,7 @@ public abstract class Striped<L> {
 
   /**
    * Creates a {@code Striped<ReadWriteLock>} with lazily initialized, weakly referenced
-   * read-write locks, with the specified fairness. Every lock is reentrant.
+   * read-write locks. Every lock is reentrant.
    *
    * @param stripes the minimum number of stripes (locks) required
    * @return a new {@code Striped<ReadWriteLock>}
@@ -308,18 +309,28 @@ public abstract class Striped<L> {
    * user key's (smeared) hashCode(). The stripes are lazily initialized and are weakly referenced.
    */
   private static class LazyStriped<L> extends PowerOfTwoStriped<L> {
-    final ConcurrentMap<Integer, L> cache;
+    final ConcurrentMap<Integer, L> locks;
+    final Supplier<L> supplier;
     final int size;
 
     LazyStriped(int stripes, Supplier<L> supplier) {
       super(stripes);
       this.size = (mask == ALL_SET) ? Integer.MAX_VALUE : mask + 1;
-      this.cache = new MapMaker().weakValues().makeComputingMap(Functions.forSupplier(supplier));
+      this.supplier = supplier;
+      this.locks = new MapMaker().weakValues().makeMap();
     }
 
     @Override public L getAt(int index) {
-      Preconditions.checkElementIndex(index, size());
-      return cache.get(index);
+      if (size != Integer.MAX_VALUE) {
+        Preconditions.checkElementIndex(index, size());
+      } // else no check necessary, all index values are valid
+      L existing = locks.get(index);
+      if (existing != null) {
+        return existing;
+      }
+      L created = supplier.get();
+      existing = locks.putIfAbsent(index, created);
+      return firstNonNull(existing, created);
     }
 
     @Override public int size() {

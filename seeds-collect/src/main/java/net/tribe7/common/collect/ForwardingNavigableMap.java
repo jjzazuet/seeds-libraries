@@ -16,15 +16,16 @@
 
 package net.tribe7.common.collect;
 
+import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 import static net.tribe7.common.collect.Maps.keyOrNull;
-
-import net.tribe7.common.annotations.Beta;
 
 import java.util.Iterator;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * A navigable map which forwards all its method calls to another navigable map. Subclasses should
@@ -305,7 +306,7 @@ public abstract class ForwardingNavigableMap<K, V>
 
         @Override
         public void remove() {
-          Iterators.checkRemove(toRemove != null);
+          checkRemove(toRemove != null);
           forward().remove(toRemove.getKey());
           toRemove = null;
         }

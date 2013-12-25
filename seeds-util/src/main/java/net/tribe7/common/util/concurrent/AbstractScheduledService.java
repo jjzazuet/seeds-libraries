@@ -16,10 +16,6 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
-import net.tribe7.common.base.Throwables;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -27,11 +23,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.concurrent.GuardedBy;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
+import net.tribe7.common.base.Supplier;
+import net.tribe7.common.base.Throwables;
 
 /**
  * Base class for services that can implement {@link #startUp} and {@link #shutDown} but while in 
@@ -54,7 +56,7 @@ import javax.annotation.concurrent.GuardedBy;
  * 
  * <h3>Usage Example</h3>
  * 
- * Here is a sketch of a service which crawls a website and uses the scheduling capabilities to 
+ * <p>Here is a sketch of a service which crawls a website and uses the scheduling capabilities to 
  * rate limit itself. <pre> {@code
  * class CrawlingService extends AbstractScheduledService {
  *   private Set<Uri> visited;
@@ -81,7 +83,7 @@ import javax.annotation.concurrent.GuardedBy;
  *   }
  * }}</pre>
  * 
- * This class uses the life cycle methods to read in a list of starting URIs and save the set of 
+ * <p>This class uses the life cycle methods to read in a list of starting URIs and save the set of 
  * outstanding URIs when shutting down.  Also, it takes advantage of the scheduling functionality to
  * rate limit the number of queries we perform.
  * 
@@ -184,7 +186,11 @@ public abstract class AbstractScheduledService implements Service {
     };
     
     @Override protected final void doStart() {
-      executorService = executor();
+      executorService = MoreExecutors.renamingDecorator(executor(), new Supplier<String>() {
+        @Override public String get() {
+          return serviceName() + " " + state();
+        }
+      });
       executorService.execute(new Runnable() {
         @Override public void run() {
           lock.lock();
@@ -288,9 +294,6 @@ public abstract class AbstractScheduledService implements Service {
     // is called within doStart() so we know that the service cannot terminate or fail concurrently
     // with adding this listener so it is impossible to miss an event that we are interested in.
     addListener(new Listener() {
-      @Override public void starting() {}
-      @Override public void running() {}
-      @Override public void stopping(State from) {}
       @Override public void terminated(State from) {
         executor.shutdown();
       }
@@ -316,11 +319,15 @@ public abstract class AbstractScheduledService implements Service {
 
   // We override instead of using ForwardingService so that these can be final.
 
-  @Override public final ListenableFuture<State> start() {
+  @Deprecated
+  @Override 
+   public final ListenableFuture<State> start() {
     return delegate.start();
   }
 
-  @Override public final State startAndWait() {
+  @Deprecated
+  @Override 
+   public final State startAndWait() {
     return delegate.startAndWait();
   }
 
@@ -332,11 +339,15 @@ public abstract class AbstractScheduledService implements Service {
     return delegate.state();
   }
 
-  @Override public final ListenableFuture<State> stop() {
+  @Deprecated
+  @Override 
+   public final ListenableFuture<State> stop() {
     return delegate.stop();
   }
 
-  @Override public final State stopAndWait() {
+  @Deprecated
+  @Override 
+   public final State stopAndWait() {
     return delegate.stopAndWait();
   }
   
@@ -352,6 +363,50 @@ public abstract class AbstractScheduledService implements Service {
    */
   @Override public final Throwable failureCause() {
     return delegate.failureCause();
+  }
+  
+  /**
+   * @since 15.0
+   */
+  @Override public final Service startAsync() {
+    delegate.startAsync();
+    return this;
+  }
+  
+  /**
+   * @since 15.0
+   */
+  @Override public final Service stopAsync() {
+    delegate.stopAsync();
+    return this;
+  }
+  
+  /**
+   * @since 15.0
+   */
+  @Override public final void awaitRunning() {
+    delegate.awaitRunning();
+  }
+  
+  /**
+   * @since 15.0
+   */
+  @Override public final void awaitRunning(long timeout, TimeUnit unit) throws TimeoutException {
+    delegate.awaitRunning(timeout, unit);
+  }
+  
+  /**
+   * @since 15.0
+   */
+  @Override public final void awaitTerminated() {
+    delegate.awaitTerminated();
+  }
+  
+  /**
+   * @since 15.0
+   */
+  @Override public final void awaitTerminated(long timeout, TimeUnit unit) throws TimeoutException {
+    delegate.awaitTerminated(timeout, unit);
   }
   
   /**

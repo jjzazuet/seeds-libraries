@@ -16,15 +16,15 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * File name filter that only accepts files matching a regular expression. This

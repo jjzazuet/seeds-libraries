@@ -17,10 +17,10 @@ package net.tribe7.common.hash;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.base.Supplier;
-
 import java.io.Serializable;
 import java.util.zip.Checksum;
+
+import net.tribe7.common.base.Supplier;
 
 /**
  * {@link HashFunction} adapter for {@link Checksum} instances.
@@ -85,9 +85,9 @@ final class ChecksumHashFunction extends AbstractStreamingHashFunction implement
          * cast won't lose any information and is necessary to return a HashCode of the correct
          * size.
          */
-        return HashCodes.fromInt((int) value);
+        return HashCode.fromInt((int) value);
       } else {
-        return HashCodes.fromLong(value);
+        return HashCode.fromLong(value);
       }
     }
   }

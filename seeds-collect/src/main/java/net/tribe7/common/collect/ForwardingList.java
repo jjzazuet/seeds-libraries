@@ -16,15 +16,15 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A list which forwards all its method calls to another list. Subclasses should
@@ -127,7 +127,7 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E>
    *
    * @since 7.0
    */
-  protected boolean standardAdd(E element){
+  protected boolean standardAdd(E element) {
     add(size(), element);
     return true;
   }

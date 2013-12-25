@@ -18,6 +18,9 @@ package net.tribe7.common.cache;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.GwtCompatible;
 import net.tribe7.common.annotations.GwtIncompatible;
@@ -25,9 +28,6 @@ import net.tribe7.common.base.Function;
 import net.tribe7.common.base.Supplier;
 import net.tribe7.common.util.concurrent.Futures;
 import net.tribe7.common.util.concurrent.ListenableFuture;
-
-import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Computes or retrieves values, based on a key, for use in populating a {@link LoadingCache}.

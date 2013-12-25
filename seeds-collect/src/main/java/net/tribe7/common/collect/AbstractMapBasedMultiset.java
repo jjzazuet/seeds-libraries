@@ -18,12 +18,8 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
-import static net.tribe7.common.base.Preconditions.checkState;
-import static net.tribe7.common.collect.Multisets.checkNonnegative;
-
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.primitives.Ints;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
+import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
@@ -34,6 +30,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * Basic implementation of {@code Multiset<E>} backed by an instance of {@code
@@ -105,21 +105,21 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E>
           }
           @Override
           public int getCount() {
-            int count = mapEntry.getValue().get();
-            if (count == 0) {
+            Count count = mapEntry.getValue();
+            if (count == null || count.get() == 0) {
               Count frequency = backingMap.get(getElement());
               if (frequency != null) {
-                count = frequency.get();
+                return frequency.get();
               }
             }
-            return count;
+            return (count == null) ? 0 : count.get();
           }
         };
       }
 
       @Override
       public void remove() {
-        Iterators.checkRemove(toRemove != null);
+        checkRemove(toRemove != null);
         size -= toRemove.getValue().getAndSet(0);
         backingEntries.remove();
         toRemove = null;
@@ -184,8 +184,7 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E>
 
     @Override
     public void remove() {
-      checkState(canRemove,
-          "no calls to next() since the last call to remove()");
+      checkRemove(canRemove);
       int frequency = currentEntry.getValue().get();
       if (frequency <= 0) {
         throw new ConcurrentModificationException();

@@ -17,12 +17,7 @@
 package net.tribe7.common.io;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
-
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Charsets;
-import net.tribe7.common.base.Splitter;
-import net.tribe7.common.collect.AbstractIterator;
-import net.tribe7.common.collect.ImmutableList;
+import static net.tribe7.common.base.Preconditions.checkPositionIndexes;
 
 import java.io.Closeable;
 import java.io.EOFException;
@@ -38,9 +33,12 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Charsets;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.collect.Iterables;
 
 /**
  * Provides utility methods for working with character streams.
@@ -72,85 +70,19 @@ public final class CharStreams {
    */
   public static InputSupplier<StringReader> newReaderSupplier(
       final String value) {
-    return CharStreams.asInputSupplier(asCharSource(value));
+    return asInputSupplier(CharSource.wrap(value));
   }
 
   /**
    * Returns a {@link CharSource} that reads the given string value.
    *
    * @since 14.0
+   * @deprecated Use {@link CharSource#wrap(CharSequence)} instead. This method
+   *     is scheduled to be removed in Guava 16.0.
    */
+  @Deprecated
   public static CharSource asCharSource(String string) {
-    return new StringCharSource(string);
-  }
-
-  private static final class StringCharSource extends CharSource {
-
-    private static final Splitter LINE_SPLITTER
-        = Splitter.on(Pattern.compile("\r\n|\n|\r"));
-
-    private final String string;
-
-    private StringCharSource(String string) {
-      this.string = checkNotNull(string);
-    }
-
-    @Override
-    public Reader openStream() {
-      return new StringReader(string);
-    }
-
-    @Override
-    public String read() {
-      return string;
-    }
-
-    /**
-     * Returns an iterable over the lines in the string. If the string ends in
-     * a newline, a final empty string is not included to match the behavior of
-     * BufferedReader/LineReader.readLine().
-     */
-    private Iterable<String> lines() {
-      return new Iterable<String>() {
-        @Override
-        public Iterator<String> iterator() {
-          return new AbstractIterator<String>() {
-            Iterator<String> lines = LINE_SPLITTER.split(string).iterator();
-
-            @Override
-            protected String computeNext() {
-              if (lines.hasNext()) {
-                String next = lines.next();
-                // skip last line if it's empty
-                if (lines.hasNext() || !next.isEmpty()) {
-                  return next;
-                }
-              }
-              return endOfData();
-            }
-          };
-        }
-      };
-    }
-
-    @Override
-    public String readFirstLine() {
-      Iterator<String> lines = lines().iterator();
-      return lines.hasNext() ? lines.next() : null;
-    }
-
-    @Override
-    public ImmutableList<String> readLines() {
-      return ImmutableList.copyOf(lines());
-    }
-
-    @Override
-    public String toString() {
-      String limited = (string.length() <= 15)
-          ? string
-          : string.substring(0, 12) + "...";
-      return "CharStreams.asCharSource(" + limited + ")";
-    }
+    return CharSource.wrap(string);
   }
 
   /**
@@ -164,7 +96,7 @@ public final class CharStreams {
    */
   public static InputSupplier<InputStreamReader> newReaderSupplier(
       final InputSupplier<? extends InputStream> in, final Charset charset) {
-    return CharStreams.asInputSupplier(
+    return asInputSupplier(
         ByteStreams.asByteSource(in).asCharSource(charset));
   }
 
@@ -179,7 +111,7 @@ public final class CharStreams {
    */
   public static OutputSupplier<OutputStreamWriter> newWriterSupplier(
       final OutputSupplier<? extends OutputStream> out, final Charset charset) {
-    return CharStreams.asOutputSupplier(
+    return asOutputSupplier(
         ByteStreams.asByteSink(out).asCharSink(charset));
   }
 
@@ -417,14 +349,18 @@ public final class CharStreams {
   public static InputSupplier<Reader> join(
       final Iterable<? extends InputSupplier<? extends Reader>> suppliers) {
     checkNotNull(suppliers);
-    return new InputSupplier<Reader>() {
-      @Override public Reader getInput() throws IOException {
-        return new MultiReader(suppliers.iterator());
-      }
-    };
+    Iterable<CharSource> sources = Iterables.transform(suppliers,
+        new Function<InputSupplier<? extends Reader>, CharSource>() {
+          @Override
+          public CharSource apply(InputSupplier<? extends Reader> input) {
+            return asCharSource(input);
+          }
+        });
+    return asInputSupplier(CharSource.concat(sources));
   }
 
   /** Varargs form of {@link #join(Iterable)}. */
+  @SuppressWarnings("unchecked") // suppress "possible heap pollution" warning in JDK7
   public static InputSupplier<Reader> join(
       InputSupplier<? extends Reader>... suppliers) {
     return join(Arrays.asList(suppliers));
@@ -438,7 +374,7 @@ public final class CharStreams {
    * @param reader the reader to read from
    * @param n the number of characters to skip
    * @throws EOFException if this stream reaches the end before skipping all
-   *     the bytes
+   *     the characters
    * @throws IOException if an I/O error occurs
    */
   public static void skipFully(Reader reader, long n) throws IOException {
@@ -454,6 +390,74 @@ public final class CharStreams {
       } else {
         n -= amt;
       }
+    }
+  }
+
+  /**
+   * Returns a {@link Writer} that simply discards written chars.
+   *
+   * @since 15.0
+   */
+  public static Writer nullWriter() {
+    return NullWriter.INSTANCE;
+  }
+
+  private static final class NullWriter extends Writer {
+
+    private static final NullWriter INSTANCE = new NullWriter();
+
+    @Override
+    public void write(int c) {
+    }
+
+    @Override
+    public void write(char[] cbuf) {
+      checkNotNull(cbuf);
+    }
+
+    @Override
+    public void write(char[] cbuf, int off, int len) {
+      checkPositionIndexes(off, off + len, cbuf.length);
+    }
+
+    @Override
+    public void write(String str) {
+      checkNotNull(str);
+    }
+
+    @Override
+    public void write(String str, int off, int len) {
+      checkPositionIndexes(off, off + len, str.length());
+    }
+
+    @Override
+    public Writer append(CharSequence csq) {
+      checkNotNull(csq);
+      return this;
+    }
+
+    @Override
+    public Writer append(CharSequence csq, int start, int end) {
+      checkPositionIndexes(start, end, csq.length());
+      return this;
+    }
+
+    @Override
+    public Writer append(char c) {
+      return this;
+    }
+
+    @Override
+    public void flush() {
+    }
+
+    @Override
+    public void close() {
+    }
+
+    @Override
+    public String toString() {
+      return "CharStreams.nullWriter()";
     }
   }
 
@@ -476,7 +480,7 @@ public final class CharStreams {
 
   // TODO(user): Remove these once Input/OutputSupplier methods are removed
 
-  static <R extends Readable & Closeable> Reader asReader(final R readable) {
+  static Reader asReader(final Readable readable) {
     checkNotNull(readable);
     if (readable instanceof Reader) {
       return (Reader) readable;
@@ -494,52 +498,72 @@ public final class CharStreams {
 
       @Override
       public void close() throws IOException {
-        readable.close();
+        if (readable instanceof Closeable) {
+          ((Closeable) readable).close();
+        }
       }
     };
   }
 
-  static <R extends Reader> InputSupplier<R> asInputSupplier(
-      final CharSource source) {
-    checkNotNull(source);
-    return new InputSupplier<R>() {
-      @Override
-      public R getInput() throws IOException {
-        return (R) source.openStream();
-      }
-    };
-  }
-
-  static <W extends Writer> OutputSupplier<W> asOutputSupplier(
-      final CharSink sink) {
-    checkNotNull(sink);
-    return new OutputSupplier<W>() {
-      @Override
-      public W getOutput() throws IOException {
-        return (W) sink.openStream();
-      }
-    };
-  }
-
-  static <R extends Readable & Closeable> CharSource asCharSource(
-      final InputSupplier<R> supplier) {
+  /**
+   * Returns a view of the given {@code Readable} supplier as a
+   * {@code CharSource}.
+   *
+   * <p>This method is a temporary method provided for easing migration from
+   * suppliers to sources and sinks.
+   *
+   * @since 15.0
+   */
+  public static CharSource asCharSource(
+      final InputSupplier<? extends Readable> supplier) {
     checkNotNull(supplier);
     return new CharSource() {
       @Override
       public Reader openStream() throws IOException {
         return asReader(supplier.getInput());
       }
+
+      @Override
+      public String toString() {
+        return "CharStreams.asCharSource(" + supplier + ")";
+      }
     };
   }
 
-  static <W extends Appendable & Closeable> CharSink asCharSink(
-      final OutputSupplier<W> supplier) {
+  /**
+   * Returns a view of the given {@code Appendable} supplier as a
+   * {@code CharSink}.
+   *
+   * <p>This method is a temporary method provided for easing migration from
+   * suppliers to sources and sinks.
+   *
+   * @since 15.0
+   */
+  public static CharSink asCharSink(
+      final OutputSupplier<? extends Appendable> supplier) {
     checkNotNull(supplier);
     return new CharSink() {
       @Override
       public Writer openStream() throws IOException {
         return asWriter(supplier.getOutput());
       }
+
+      @Override
+      public String toString() {
+        return "CharStreams.asCharSink(" + supplier + ")";
+      }
     };
+  }
+
+  @SuppressWarnings("unchecked") // used internally where known to be safe
+  static <R extends Reader> InputSupplier<R> asInputSupplier(
+      CharSource source) {
+    return (InputSupplier) checkNotNull(source);
+  }
+
+  @SuppressWarnings("unchecked") // used internally where known to be safe
+  static <W extends Writer> OutputSupplier<W> asOutputSupplier(
+      CharSink sink) {
+    return (OutputSupplier) checkNotNull(sink);
   }
 }

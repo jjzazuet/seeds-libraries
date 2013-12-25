@@ -16,11 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Workaround for

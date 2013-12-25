@@ -16,9 +16,9 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Iterator;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * An iterator which forwards all its method calls to another iterator.

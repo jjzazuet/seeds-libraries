@@ -16,12 +16,12 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.Set;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A skeleton implementation of a descending multiset.  Only needs

@@ -16,11 +16,11 @@
 
 package net.tribe7.common.util.concurrent;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * A future which forwards all its method calls to another future. Subclasses

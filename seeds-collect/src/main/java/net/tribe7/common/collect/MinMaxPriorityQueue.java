@@ -20,10 +20,7 @@ import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkPositionIndex;
 import static net.tribe7.common.base.Preconditions.checkState;
-
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.math.IntMath;
+import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.util.AbstractQueue;
 import java.util.ArrayDeque;
@@ -37,6 +34,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.math.IntMath;
 
 /**
  * A double-ended priority queue, which provides constant-time access to both
@@ -778,8 +779,7 @@ public final class MinMaxPriorityQueue<E> extends AbstractQueue<E> {
     }
 
     @Override public void remove() {
-      checkState(canRemove,
-          "no calls to remove() since the last call to next()");
+      checkRemove(canRemove);
       checkModCount();
       canRemove = false;
       expectedModCount++;

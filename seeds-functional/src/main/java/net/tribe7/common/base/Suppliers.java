@@ -16,14 +16,14 @@
 
 package net.tribe7.common.base;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.VisibleForTesting;
-
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.VisibleForTesting;
 
 /**
  * Useful suppliers.

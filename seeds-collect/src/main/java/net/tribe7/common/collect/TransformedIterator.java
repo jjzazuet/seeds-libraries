@@ -18,9 +18,9 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Iterator;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * An iterator that transforms a backing iterator; for internal use. This avoids

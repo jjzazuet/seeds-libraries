@@ -17,7 +17,6 @@
 package net.tribe7.common.base;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
-
 import net.tribe7.common.annotations.GwtCompatible;
 
 /**

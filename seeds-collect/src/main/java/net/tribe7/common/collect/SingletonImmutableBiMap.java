@@ -16,9 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
+import static net.tribe7.common.collect.CollectPreconditions.checkEntryNotNull;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Implementation of {@link ImmutableMap} with exactly one entry.
@@ -34,6 +36,7 @@ final class SingletonImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
   final transient V singleValue;
 
   SingletonImmutableBiMap(K singleKey, V singleValue) {
+    checkEntryNotNull(singleKey, singleValue);
     this.singleKey = singleKey;
     this.singleValue = singleValue;
   }
@@ -45,7 +48,7 @@ final class SingletonImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
     this.inverse = inverse;
   }
 
-  SingletonImmutableBiMap(Entry<K, V> entry) {
+  SingletonImmutableBiMap(Entry<? extends K, ? extends V> entry) {
     this(entry.getKey(), entry.getValue());
   }
 

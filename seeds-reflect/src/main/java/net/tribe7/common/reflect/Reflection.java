@@ -19,10 +19,10 @@ package net.tribe7.common.reflect;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * Static utilities relating to Java reflection.

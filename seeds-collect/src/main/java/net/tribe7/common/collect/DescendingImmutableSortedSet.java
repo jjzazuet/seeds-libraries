@@ -16,9 +16,9 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtIncompatible;
-
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * Skeletal implementation of {@link ImmutableSortedSet#descendingSet()}.

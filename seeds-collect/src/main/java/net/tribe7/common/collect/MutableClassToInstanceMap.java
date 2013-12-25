@@ -16,11 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.collect.MapConstraints.ConstrainedMap;
-import net.tribe7.common.primitives.Primitives;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import net.tribe7.common.collect.MapConstraints.ConstrainedMap;
+import net.tribe7.common.primitives.Primitives;
 
 /**
  * A mutable class-to-instance map backed by an arbitrary user-provided map.

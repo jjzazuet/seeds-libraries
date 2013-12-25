@@ -16,17 +16,26 @@
 
 package net.tribe7.common.reflect;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import javax.annotation.Nullable;
 
+import net.tribe7.common.annotations.Beta;
+
 /**
  * Abstract implementation of {@link InvocationHandler} that handles {@link Object#equals},
- * {@link Object#hashCode} and {@link Object#toString}.
+ * {@link Object#hashCode} and {@link Object#toString}. For example: <pre>
+ * class Unsupported extends AbstractInvocationHandler {
+ *   protected Object handleInvocation(
+ *       Object proxy, Method method, Object[] args) {
+ *     throw new UnsupportedOperationException();
+ *   }
+ * }
+ *
+ * CharSequence unsupported = Reflection.newProxy(CharSequence.class, new Unsupported());
+ * </pre>
  *
  * @author Ben Yu
  * @since 12.0
@@ -87,7 +96,7 @@ public abstract class AbstractInvocationHandler implements InvocationHandler {
    * <li>{@code proxy} and {@code argument} are of the same type
    * <li>and this method returns true for the {@link InvocationHandler} of {@code argument}
    * </ul>
-   * Subclasses can override this method to provide custom equality.
+   * <p>Subclasses can override this method to provide custom equality.
    */
   @Override public boolean equals(Object obj) {
     return super.equals(obj);

@@ -18,10 +18,10 @@ package net.tribe7.common.eventbus;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * An {@link EventBus} that takes the Executor of your choice and uses it to

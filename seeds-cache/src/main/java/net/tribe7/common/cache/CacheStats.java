@@ -18,13 +18,13 @@ package net.tribe7.common.cache;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Objects;
-
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * Statistics about the performance of a {@link Cache}. Instances of this class are immutable.

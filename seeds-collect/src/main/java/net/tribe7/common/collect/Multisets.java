@@ -18,14 +18,8 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
-
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Objects;
-import net.tribe7.common.base.Predicate;
-import net.tribe7.common.base.Predicates;
-import net.tribe7.common.collect.Multiset.Entry;
-import net.tribe7.common.primitives.Ints;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
+import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -36,6 +30,14 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
+import net.tribe7.common.base.Predicate;
+import net.tribe7.common.base.Predicates;
+import net.tribe7.common.collect.Multiset.Entry;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * Provides static utility methods for creating and working with {@link
@@ -283,6 +285,11 @@ public final class Multisets {
     }
 
     @Override
+    public UnmodifiableIterator<E> iterator() {
+      return Iterators.filter(unfiltered.iterator(), predicate);
+    }
+
+    @Override
     Set<E> createElementSet() {
       return Sets.filter(unfiltered.elementSet(), predicate);
     }
@@ -308,11 +315,6 @@ public final class Multisets {
     }
 
     @Override
-    public boolean contains(@Nullable Object element) {
-      return count(element) > 0;
-    }
-
-    @Override
     public int count(@Nullable Object element) {
       int count = unfiltered.count(element);
       if (count > 0) {
@@ -332,22 +334,12 @@ public final class Multisets {
 
     @Override
     public int remove(@Nullable Object element, int occurrences) {
-      Multisets.checkNonnegative(occurrences, "occurrences");
+      checkNonnegative(occurrences, "occurrences");
       if (occurrences == 0) {
         return count(element);
       } else {
         return contains(element) ? unfiltered.remove(element, occurrences) : 0;
       }
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-      return elementSet().removeAll(c);
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-      return elementSet().retainAll(c);
     }
 
     @Override
@@ -417,6 +409,7 @@ public final class Multisets {
             = multiset1.entrySet().iterator();
         final Iterator<? extends Entry<? extends E>> iterator2
             = multiset2.entrySet().iterator();
+        // TODO(user): consider making the entries live views
         return new AbstractIterator<Entry<E>>() {
           @Override
           protected Entry<E> computeNext() {
@@ -480,6 +473,7 @@ public final class Multisets {
       @Override
       Iterator<Entry<E>> entryIterator() {
         final Iterator<Entry<E>> iterator1 = multiset1.entrySet().iterator();
+        // TODO(user): consider making the entries live views
         return new AbstractIterator<Entry<E>>() {
           @Override
           protected Entry<E> computeNext() {
@@ -508,7 +502,7 @@ public final class Multisets {
    * In the returned multiset, the count of each element is the <i>sum</i> of
    * its counts in the two backing multisets. The iteration order of the
    * returned multiset matches that of the element set of {@code multiset1}
-   * followed by the members of the element set of {@code multiset2} that that
+   * followed by the members of the element set of {@code multiset2} that
    * are not contained in {@code multiset1}, with repeated occurrences of the
    * same element appearing consecutively.
    *
@@ -524,6 +518,7 @@ public final class Multisets {
     checkNotNull(multiset1);
     checkNotNull(multiset2);
 
+    // TODO(user): consider making the entries live views
     return new AbstractMultiset<E>() {
       @Override
       public boolean contains(@Nullable Object element) {
@@ -605,6 +600,7 @@ public final class Multisets {
     checkNotNull(multiset1);
     checkNotNull(multiset2);
 
+    // TODO(user): consider making the entries live views
     return new AbstractMultiset<E>() {
       @Override
       public int count(@Nullable Object element) {
@@ -1035,7 +1031,7 @@ public final class Multisets {
 
     @Override
     public void remove() {
-      Iterators.checkRemove(canRemove);
+      checkRemove(canRemove);
       if (totalCount == 1) {
         entryIterator.remove();
       } else {
@@ -1055,10 +1051,6 @@ public final class Multisets {
       size += entry.getCount();
     }
     return Ints.saturatedCast(size);
-  }
-
-  static void checkNonnegative(int count, String name) {
-    checkArgument(count >= 0, "%s cannot be negative: %s", name, count);
   }
 
   /**
@@ -1084,7 +1076,7 @@ public final class Multisets {
   @Beta
   public static <E> ImmutableMultiset<E> copyHighestCountFirst(Multiset<E> multiset) {
     List<Entry<E>> sortedEntries =
-        Multisets.DECREASING_COUNT_ORDERING.sortedCopy(multiset.entrySet());
+        Multisets.DECREASING_COUNT_ORDERING.immutableSortedCopy(multiset.entrySet());
     return ImmutableMultiset.copyFromEntries(sortedEntries);
   }
 }

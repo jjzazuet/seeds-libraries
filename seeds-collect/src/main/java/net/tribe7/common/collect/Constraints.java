@@ -18,15 +18,16 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.RandomAccess;
 import java.util.Set;
 import java.util.SortedSet;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * Factories and utilities pertaining to the {@link Constraint} interface.
@@ -35,8 +36,15 @@ import java.util.SortedSet;
  * @author Mike Bostock
  * @author Jared Levy
  * @since 3.0
+ * @deprecated Use {@link Preconditions} for basic checks. In place of
+ *     constrained collections, we encourage you to check your preconditions
+ *     explicitly instead of leaving that work to the collection implementation.
+ *     For the specific case of rejecting null, consider the immutable
+ *     collections.
+ *     This class is scheduled for removal in Guava 16.0.
  */
 @Beta
+@Deprecated
 @GwtCompatible
 public final class Constraints {
   private Constraints() {}

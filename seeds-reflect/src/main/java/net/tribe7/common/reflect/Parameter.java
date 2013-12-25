@@ -18,13 +18,13 @@ package net.tribe7.common.reflect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.collect.ImmutableList;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.collect.ImmutableList;
 
 /**
  * Represents a method or constructor parameter.

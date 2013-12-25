@@ -19,13 +19,13 @@ package net.tribe7.common.hash;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkPositionIndexes;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import net.tribe7.common.primitives.Chars;
 import net.tribe7.common.primitives.Ints;
 import net.tribe7.common.primitives.Longs;
 import net.tribe7.common.primitives.Shorts;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /**
  * Abstract {@link Hasher} that handles converting primitives to bytes using a scratch {@code

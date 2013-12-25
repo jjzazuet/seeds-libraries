@@ -22,11 +22,6 @@ import static net.tribe7.common.base.Predicates.compose;
 import static net.tribe7.common.base.Predicates.in;
 import static net.tribe7.common.base.Predicates.not;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.base.Objects;
-import net.tribe7.common.base.Predicate;
-
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
@@ -40,6 +35,11 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.base.Objects;
+import net.tribe7.common.base.Predicate;
 
 /**
  * An implementation of {@code RangeMap} based on a {@code TreeMap}, supporting
@@ -503,12 +503,7 @@ public final class TreeRangeMap<K extends Comparable, V> implements RangeMap<K, 
 
       @Override
       public Set<Range<K>> keySet() {
-        return new Maps.KeySet<Range<K>, V>() {
-          @Override
-          Map<Range<K>, V> map() {
-            return SubRangeMapAsMap.this;
-          }
-          
+        return new Maps.KeySet<Range<K>, V>(SubRangeMapAsMap.this) {
           @Override
           public boolean remove(@Nullable Object o) {
             return SubRangeMapAsMap.this.remove(o) != null;
@@ -577,12 +572,7 @@ public final class TreeRangeMap<K extends Comparable, V> implements RangeMap<K, 
       
       @Override
       public Collection<V> values() {
-        return new Maps.Values<Range<K>, V>() {
-          @Override
-          Map<Range<K>, V> map() {
-            return SubRangeMapAsMap.this;
-          }
-          
+        return new Maps.Values<Range<K>, V>(this) {          
           @Override
           public boolean removeAll(Collection<?> c) {
             return removeIf(compose(in(c), Maps.<V>valueFunction()));            

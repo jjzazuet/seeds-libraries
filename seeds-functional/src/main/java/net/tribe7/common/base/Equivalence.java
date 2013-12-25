@@ -18,12 +18,12 @@ package net.tribe7.common.base;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A strategy for determining whether two instances are considered equivalent. Examples of
@@ -120,10 +120,10 @@ public abstract class Equivalence<T> {
    * equivalence.onResultOf(function).equivalent(a, b)} is true if and only if {@code
    * equivalence.equivalent(function.apply(a), function.apply(b))} is true.
    *
-   * <p>For example: <pre>   {@code
+   * <p>For example:
    *
-   *    Equivalence<Person> SAME_AGE = Equivalence.equals().onResultOf(GET_PERSON_AGE);
-   * }</pre>
+   * <pre>   {@code
+   *    Equivalence<Person> SAME_AGE = Equivalence.equals().onResultOf(GET_PERSON_AGE);}</pre>
    * 
    * <p>{@code function} will never be invoked with a null value.
    * 
@@ -160,14 +160,12 @@ public abstract class Equivalence<T> {
    *
    * <pre>   {@code
    *   equiv.wrap("a").equals(equiv.wrap("b")) // true
-   *   equiv.wrap("a").equals(equiv.wrap("hello")) // false
-   * }</pre>
+   *   equiv.wrap("a").equals(equiv.wrap("hello")) // false}</pre>
    *
    * <p>Note in particular that an equivalence wrapper is never equal to the object it wraps.
    *
    * <pre>   {@code
-   *   equiv.wrap(obj).equals(obj) // always false
-   * }</pre>
+   *   equiv.wrap(obj).equals(obj) // always false}</pre>
    *
    * @since 10.0
    */
@@ -210,7 +208,7 @@ public abstract class Equivalence<T> {
     }
 
     /**
-     * Returns the result of {@link Equivalence#hash(Object)} applied to the the wrapped reference.
+     * Returns the result of {@link Equivalence#hash(Object)} applied to the wrapped reference.
      */
     @Override public int hashCode() {
       return equivalence.hash(reference);

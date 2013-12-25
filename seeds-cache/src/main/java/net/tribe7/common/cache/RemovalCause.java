@@ -16,12 +16,12 @@
 
 package net.tribe7.common.cache;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * The reason why a cached entry was removed.

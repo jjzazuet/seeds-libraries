@@ -19,14 +19,14 @@ package net.tribe7.common.base;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-
 import java.util.Arrays;
 import java.util.BitSet;
 
 import javax.annotation.CheckReturnValue;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
 
 /**
  * Determines a true or false value for any Java {@code char} value, just as {@link Predicate} does
@@ -445,7 +445,7 @@ public abstract class CharMatcher implements Predicate<Character> {
    * <p>To negate another {@code CharMatcher}, use {@link #negate()}.
    */
   public static CharMatcher isNot(final char match) {
-    String description = "CharMatcher.isNot(" + Integer.toHexString(match) + ")";
+    String description = "CharMatcher.isNot('" + showCharacter(match) + "')";
     return new FastMatcher(description) {
       @Override public boolean matches(char c) {
         return c != match;
@@ -795,8 +795,12 @@ public abstract class CharMatcher implements Predicate<Character> {
       // TODO(user): is it worth it to worry about the last character of large matchers?
       table.flip(Character.MIN_VALUE, Character.MAX_VALUE + 1);
       int negatedCharacters = DISTINCT_CHARS - totalCharacters;
+      String suffix = ".negate()";
+      String negatedDescription = description.endsWith(suffix)
+          ? description.substring(0, description.length() - suffix.length())
+          : description + suffix;
       return new NegatedFastMatcher(toString(),
-          precomputedPositive(negatedCharacters, table, description + ".negate()"));
+          precomputedPositive(negatedCharacters, table, negatedDescription));
     }
   }
 
@@ -869,7 +873,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 
   private static boolean isSmall(int totalCharacters, int tableLength) {
     return totalCharacters <= SmallCharMatcher.MAX_SIZE
-        && tableLength > (totalCharacters * Character.SIZE);
+        && tableLength > (totalCharacters * 4 * Character.SIZE);
+        // err on the side of BitSetMatcher
   }
 
   @GwtIncompatible("java.util.BitSet")

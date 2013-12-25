@@ -14,11 +14,11 @@
 
 package net.tribe7.common.math;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.math.BigInteger;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * A collection of preconditions for math functions.

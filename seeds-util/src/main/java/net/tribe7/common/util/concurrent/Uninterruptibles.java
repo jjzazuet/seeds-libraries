@@ -18,15 +18,15 @@ package net.tribe7.common.util.concurrent;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * Utilities for treating interruptible operations as uninterruptible.

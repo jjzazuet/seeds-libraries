@@ -16,10 +16,10 @@
 
 package net.tribe7.common.collect;
 
+import javax.annotation.Nullable;
+
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.GwtCompatible;
-
-import javax.annotation.Nullable;
 
 /**
  * A constraint on the keys and values that may be added to a {@code Map} or
@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
  *     }
  *   }}</pre>
  *
- * In order to be effective, constraints should be deterministic; that is, they
+ * <p>In order to be effective, constraints should be deterministic; that is, they
  * should not depend on state that can change (such as external state, random
  * variables, and time) and should only depend on the value of the passed-in key
  * and value. A non-deterministic constraint cannot reliably enforce that all

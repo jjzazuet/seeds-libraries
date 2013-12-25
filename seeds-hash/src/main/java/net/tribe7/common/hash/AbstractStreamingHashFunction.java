@@ -16,11 +16,11 @@ package net.tribe7.common.hash;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 
-import net.tribe7.common.base.Preconditions;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+
+import net.tribe7.common.base.Preconditions;
 
 /**
  * Skeleton implementation of {@link HashFunction}. Provides default implementations which
@@ -37,8 +37,16 @@ abstract class AbstractStreamingHashFunction implements HashFunction {
     return newHasher().putObject(instance, funnel).hash();
   }
 
+  /**
+   * @deprecated Use {@link AbstractStreamingHashFunction#hashUnencodedChars} instead.
+   */
+  @Deprecated
   @Override public HashCode hashString(CharSequence input) {
-    return newHasher().putString(input).hash();
+    return hashUnencodedChars(input);
+  }
+
+  @Override public HashCode hashUnencodedChars(CharSequence input) {
+    return newHasher().putUnencodedChars(input).hash();
   }
 
   @Override public HashCode hashString(CharSequence input, Charset charset) {
@@ -175,8 +183,17 @@ abstract class AbstractStreamingHashFunction implements HashFunction {
       return this;
     }
 
+    /**
+     * @deprecated Use {@link AbstractStreamingHasher#putUnencodedChars} instead.
+     */
+    @Deprecated
     @Override
     public final Hasher putString(CharSequence charSequence) {
+      return putUnencodedChars(charSequence);
+    }
+
+    @Override
+    public final Hasher putUnencodedChars(CharSequence charSequence) {
       for (int i = 0; i < charSequence.length(); i++) {
         putChar(charSequence.charAt(i));
       }

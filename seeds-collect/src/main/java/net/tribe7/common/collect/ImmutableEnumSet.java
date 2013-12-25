@@ -16,11 +16,11 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.EnumSet;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /**
  * Implementation of {@link ImmutableSet} backed by a non-empty {@link
@@ -79,14 +79,6 @@ final class ImmutableEnumSet<E extends Enum<E>> extends ImmutableSet<E> {
 
   @Override public boolean isEmpty() {
     return delegate.isEmpty();
-  }
-
-  @Override public Object[] toArray() {
-    return delegate.toArray();
-  }
-
-  @Override public <T> T[] toArray(T[] array) {
-    return delegate.toArray(array);
   }
 
   @Override public boolean equals(Object object) {

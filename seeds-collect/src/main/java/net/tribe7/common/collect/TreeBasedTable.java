@@ -19,11 +19,6 @@ package net.tribe7.common.collect;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Function;
-import net.tribe7.common.base.Supplier;
-
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -35,6 +30,11 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.base.Supplier;
 
 /**
  * Implementation of {@code Table} whose row keys and column keys are ordered
@@ -193,6 +193,10 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
           || compare(lowerBound, upperBound) <= 0);
     }
 
+    @Override public SortedSet<C> keySet() {
+      return new Maps.SortedKeySet<C, V>(this);
+    }
+
     @Override public Comparator<? super C> comparator() {
       return columnComparator();
     }
@@ -302,38 +306,6 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
 
   @Override public SortedMap<R, Map<C, V>> rowMap() {
     return super.rowMap();
-  }
-
-  // Overriding so NullPointerTester test passes.
-
-  @Override public boolean contains(
-      @Nullable Object rowKey, @Nullable Object columnKey) {
-    return super.contains(rowKey, columnKey);
-  }
-
-  @Override public boolean containsColumn(@Nullable Object columnKey) {
-    return super.containsColumn(columnKey);
-  }
-
-  @Override public boolean containsRow(@Nullable Object rowKey) {
-    return super.containsRow(rowKey);
-  }
-
-  @Override public boolean containsValue(@Nullable Object value) {
-    return super.containsValue(value);
-  }
-
-  @Override public V get(@Nullable Object rowKey, @Nullable Object columnKey) {
-    return super.get(rowKey, columnKey);
-  }
-
-  @Override public boolean equals(@Nullable Object obj) {
-    return super.equals(obj);
-  }
-
-  @Override public V remove(
-      @Nullable Object rowKey, @Nullable Object columnKey) {
-    return super.remove(rowKey, columnKey);
   }
 
   /**

@@ -18,10 +18,10 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.GwtCompatible;
-
 import java.io.Serializable;
 import java.util.Iterator;
+
+import net.tribe7.common.annotations.GwtCompatible;
 
 /** An ordering that uses the reverse of the natural order of the values. */
 @GwtCompatible(serializable = true)

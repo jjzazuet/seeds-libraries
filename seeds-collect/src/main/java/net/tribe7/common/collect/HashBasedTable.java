@@ -18,14 +18,14 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Supplier;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Supplier;
 
 /**
  * Implementation of {@link Table} using hash tables.

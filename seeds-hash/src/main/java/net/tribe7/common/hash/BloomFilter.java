@@ -17,15 +17,15 @@ package net.tribe7.common.hash;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
+import java.io.Serializable;
+
+import javax.annotation.Nullable;
+
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.VisibleForTesting;
 import net.tribe7.common.base.Objects;
 import net.tribe7.common.base.Predicate;
 import net.tribe7.common.hash.BloomFilterStrategies.BitArray;
-
-import java.io.Serializable;
-
-import javax.annotation.Nullable;
 
 /**
  * A Bloom filter for instances of {@code T}. A Bloom filter offers an approximate containment test
@@ -164,15 +164,66 @@ public final class BloomFilter<T> implements Predicate<T>, Serializable {
    */
   public double expectedFpp() {
     // You down with FPP? (Yeah you know me!) Who's down with FPP? (Every last homie!)
-    return Math.pow((double) bits.bitCount() / bits.size(), numHashFunctions);
+    return Math.pow((double) bits.bitCount() / bitSize(), numHashFunctions);
   }
 
   /**
-   * @deprecated Use {@link #expectedFpp} instead.
+   * Returns the number of bits in the underlying bit array.
    */
-  @Deprecated
-  public double expectedFalsePositiveProbability() {
-    return expectedFpp();
+  @VisibleForTesting long bitSize() {
+    return bits.bitSize();
+  }
+
+  /**
+   * Determines whether a given bloom filter is compatible with this bloom filter. For two
+   * bloom filters to be compatible, they must:
+   *
+   * <ul>
+   * <li>not be the same instance
+   * <li>have the same number of hash functions
+   * <li>have the same bit size
+   * <li>have the same strategy
+   * <li>have equal funnels
+   * <ul>
+   *
+   * @param that The bloom filter to check for compatibility.
+   * @since 15.0
+   */
+  public boolean isCompatible(BloomFilter<T> that) {
+    checkNotNull(that);
+    return (this != that) &&
+        (this.numHashFunctions == that.numHashFunctions) &&
+        (this.bitSize() == that.bitSize()) &&
+        (this.strategy.equals(that.strategy)) &&
+        (this.funnel.equals(that.funnel));
+  }
+
+  /**
+   * Combines this bloom filter with another bloom filter by performing a bitwise OR of the
+   * underlying data. The mutations happen to <b>this</b> instance. Callers must ensure the
+   * bloom filters are appropriately sized to avoid saturating them.
+   *
+   * @param that The bloom filter to combine this bloom filter with. It is not mutated.
+   * @throws IllegalArgumentException if {@code isCompatible(that) == false}
+   *
+   * @since 15.0
+   */
+  public void putAll(BloomFilter<T> that) {
+    checkNotNull(that);
+    checkArgument(this != that, "Cannot combine a BloomFilter with itself.");
+    checkArgument(this.numHashFunctions == that.numHashFunctions,
+        "BloomFilters must have the same number of hash functions (%s != %s)",
+        this.numHashFunctions, that.numHashFunctions);
+    checkArgument(this.bitSize() == that.bitSize(),
+        "BloomFilters must have the same size underlying bit arrays (%s != %s)",
+        this.bitSize(), that.bitSize());
+    checkArgument(this.strategy.equals(that.strategy),
+        "BloomFilters must have equal strategies (%s != %s)",
+        this.strategy, that.strategy);
+    checkArgument(this.funnel.equals(that.funnel),
+        "BloomFilters must have equal funnels (%s != %s)",
+        this.funnel, that.funnel);
+    this.bits.putAll(that.bits);
   }
 
   @Override
@@ -196,8 +247,8 @@ public final class BloomFilter<T> implements Predicate<T>, Serializable {
   }
 
   /**
-   * Creates a {@code Builder} of a {@link BloomFilter BloomFilter<T>}, with the expected number
-   * of insertions and expected false positive probability.
+   * Creates a {@link BloomFilter BloomFilter<T>} with the expected number of
+   * insertions and expected false positive probability.
    *
    * <p>Note that overflowing a {@code BloomFilter} with significantly more elements
    * than specified, will result in its saturation, and a sharp deterioration of its
@@ -206,9 +257,9 @@ public final class BloomFilter<T> implements Predicate<T>, Serializable {
    * <p>The constructed {@code BloomFilter<T>} will be serializable if the provided
    * {@code Funnel<T>} is.
    *
-   * <p>It is recommended the funnel is implemented as a Java enum. This has the benefit of ensuring
-   * proper serialization and deserialization, which is important since {@link #equals} also relies
-   * on object identity of funnels.
+   * <p>It is recommended that the funnel be implemented as a Java enum. This has the
+   * benefit of ensuring proper serialization and deserialization, which is important
+   * since {@link #equals} also relies on object identity of funnels.
    *
    * @param funnel the funnel of T's that the constructed {@code BloomFilter<T>} will use
    * @param expectedInsertions the number of expected insertions to the constructed
@@ -230,7 +281,7 @@ public final class BloomFilter<T> implements Predicate<T>, Serializable {
      * TODO(user): Put a warning in the javadoc about tiny fpp values,
      * since the resulting size is proportional to -log(p), but there is not
      * much of a point after all, e.g. optimalM(1000, 0.0000000000000001) = 76680
-     * which is less that 10kb. Who cares!
+     * which is less than 10kb. Who cares!
      */
     long numBits = optimalNumOfBits(expectedInsertions, fpp);
     int numHashFunctions = optimalNumOfHashFunctions(expectedInsertions, numBits);
@@ -243,8 +294,8 @@ public final class BloomFilter<T> implements Predicate<T>, Serializable {
   }
 
   /**
-   * Creates a {@code Builder} of a {@link BloomFilter BloomFilter<T>}, with the expected number
-   * of insertions, and a default expected false positive probability of 3%.
+   * Creates a {@link BloomFilter BloomFilter<T>} with the expected number of
+   * insertions and a default expected false positive probability of 3%.
    *
    * <p>Note that overflowing a {@code BloomFilter} with significantly more elements
    * than specified, will result in its saturation, and a sharp deterioration of its
@@ -268,7 +319,6 @@ public final class BloomFilter<T> implements Predicate<T>, Serializable {
    * m: total bits
    * n: expected insertions
    * b: m/n, bits per insertion
-
    * p: expected false positive probability
    *
    * 1) Optimal k = b * ln2

@@ -18,22 +18,22 @@ package net.tribe7.common.reflect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 import javax.annotation.Nullable;
 
+import net.tribe7.common.annotations.Beta;
+
 /**
  * Captures a free type variable that can be used in {@link TypeToken#where}.
- * For example: <pre>   {@code
+ * For example:
  *
+ * <pre>   {@code
  *   static <T> TypeToken<List<T>> listOf(Class<T> elementType) {
  *     return new TypeToken<List<T>>() {}
  *         .where(new TypeParameter<T>() {}, elementType);
- *   }
- * }</pre>
+ *   }}</pre>
  *
  * @author Ben Yu
  * @since 12.0

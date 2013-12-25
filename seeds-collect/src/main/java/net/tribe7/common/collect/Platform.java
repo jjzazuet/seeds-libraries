@@ -16,17 +16,19 @@
 
 package net.tribe7.common.collect;
 
+import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+
 import net.tribe7.common.annotations.GwtCompatible;
 import net.tribe7.common.base.Function;
 import net.tribe7.common.base.Predicate;
 import net.tribe7.common.collect.Maps.EntryTransformer;
-
-import java.lang.reflect.Array;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NavigableSet;
-import java.util.SortedMap;
-import java.util.SortedSet;
 
 /**
  * Methods factored out so that they can be emulated differently in GWT.
@@ -35,14 +37,6 @@ import java.util.SortedSet;
  */
 @GwtCompatible(emulated = true)
 class Platform {
-  /**
-   * Clone the given array using {@link Object#clone()}.  It is factored out so
-   * that it can be emulated in GWT.
-   */
-  static <T> T[] clone(T[] array) {
-    return array.clone();
-  }
-
   /**
    * Returns a new array of the given length with the same type as a reference
    * array.
@@ -58,6 +52,10 @@ class Platform {
     @SuppressWarnings("unchecked")
     T[] result = (T[]) Array.newInstance(type, length);
     return result;
+  }
+  
+  static <E> Set<E> newSetFromMap(Map<E, Boolean> map) {
+    return Collections.newSetFromMap(map);
   }
 
   /**

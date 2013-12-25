@@ -14,10 +14,10 @@
 
 package net.tribe7.common.hash;
 
+import java.nio.charset.Charset;
+
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.primitives.Ints;
-
-import java.nio.charset.Charset;
 
 /**
  * A hash function is a collision-averse pure function that maps an arbitrary block of
@@ -137,7 +137,7 @@ public interface HashFunction {
    *   HashFunction hf = Hashing.md5();
    *   HashCode hc = hf.newHasher()
    *       .putLong(id)
-   *       .putString(name)
+   *       .putBoolean(isActive)
    *       .hash();}</pre>
    */
   Hasher newHasher();
@@ -184,12 +184,25 @@ public interface HashFunction {
   HashCode hashBytes(byte[] input, int off, int len);
 
   /**
-   * Shortcut for {@code newHasher().putString(input).hash()}. The implementation <i>might</i>
-   * perform better than its longhand equivalent, but should not perform worse. Note that no
-   * character encoding is performed; the low byte and high byte of each character are hashed
-   * directly (in that order). This is equivalent to using
-   * {@code hashString(input, Charsets.UTF_16LE)}.
+   * Shortcut for {@code newHasher().putUnencodedChars(input).hash()}. The implementation
+   * <i>might</i> perform better than its longhand equivalent, but should not perform worse.
+   * Note that no character encoding is performed; the low byte and high byte of each {@code char}
+   * are hashed directly (in that order).
+   *
+   * @since 15.0 (since 11.0 as hashString(CharSequence)).
    */
+  HashCode hashUnencodedChars(CharSequence input);
+
+  /**
+   * Shortcut for {@code newHasher().putUnencodedChars(input).hash()}. The implementation
+   * <i>might</i> perform better than its longhand equivalent, but should not perform worse.
+   * Note that no character encoding is performed; the low byte and high byte of each {@code char}
+   * are hashed directly (in that order).
+   *
+   * @deprecated Use {@link HashFunction#hashUnencodedChars} instead. This method is scheduled for
+   *     removal in Guava 16.0.
+   */
+  @Deprecated
   HashCode hashString(CharSequence input);
 
   /**

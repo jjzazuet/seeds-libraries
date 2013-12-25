@@ -18,14 +18,8 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
-import static net.tribe7.common.base.Preconditions.checkState;
-import static net.tribe7.common.collect.Multisets.checkNonnegative;
-
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.collect.Serialization.FieldSetter;
-import net.tribe7.common.math.IntMath;
-import net.tribe7.common.primitives.Ints;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
+import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -41,6 +35,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.collect.Serialization.FieldSetter;
+import net.tribe7.common.math.IntMath;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * A multiset that supports concurrent modifications and that provides atomic versions of most
@@ -119,11 +119,11 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
    * internally and not exposed externally, so no one else will have a strong reference to the
    * values. Weak keys on the other hand can be useful in some scenarios.
    *
-   * @since 7.0
+   * @since 15.0 (source compatible (accepting the since removed {@code GenericMapMaker} class)
+   *     since 7.0)
    */
   @Beta
-  public static <E> ConcurrentHashMultiset<E> create(
-      GenericMapMaker<? super E, ? super Number> mapMaker) {
+  public static <E> ConcurrentHashMultiset<E> create(MapMaker mapMaker) {
     return new ConcurrentHashMultiset<E>(mapMaker.<E, AtomicInteger>makeMap());
   }
 
@@ -524,7 +524,7 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
       }
 
       @Override public void remove() {
-        checkState(last != null);
+        checkRemove(last != null);
         ConcurrentHashMultiset.this.setCount(last.getElement(), 0);
         last = null;
       }

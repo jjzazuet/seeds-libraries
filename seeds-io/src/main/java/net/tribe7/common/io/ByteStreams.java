@@ -20,10 +20,6 @@ import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Preconditions.checkPositionIndex;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.hash.HashCode;
-import net.tribe7.common.hash.HashFunction;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -39,7 +35,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
-import java.util.zip.Checksum;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Function;
+import net.tribe7.common.collect.Iterables;
+import net.tribe7.common.hash.HashCode;
+import net.tribe7.common.hash.HashFunction;
 
 /**
  * Provides utility methods for working with byte arrays and I/O streams.
@@ -63,7 +64,7 @@ public final class ByteStreams {
    */
   public static InputSupplier<ByteArrayInputStream> newInputStreamSupplier(
       byte[] b) {
-    return ByteStreams.asInputSupplier(asByteSource(b));
+    return asInputSupplier(ByteSource.wrap(b));
   }
 
   /**
@@ -77,58 +78,19 @@ public final class ByteStreams {
    */
   public static InputSupplier<ByteArrayInputStream> newInputStreamSupplier(
       final byte[] b, final int off, final int len) {
-    return ByteStreams.asInputSupplier(asByteSource(b).slice(off, len));
+    return asInputSupplier(ByteSource.wrap(b).slice(off, len));
   }
 
   /**
    * Returns a new {@link ByteSource} that reads bytes from the given byte array.
    *
    * @since 14.0
+   * @deprecated Use {@link ByteSource#wrap(byte[])} instead. This method is
+   *     scheduled to be removed in Guava 16.0.
    */
+  @Deprecated
   public static ByteSource asByteSource(byte[] b) {
-    return new ByteArrayByteSource(b);
-  }
-
-  private static final class ByteArrayByteSource extends ByteSource {
-
-    private final byte[] bytes;
-
-    private ByteArrayByteSource(byte[] bytes) {
-      this.bytes = checkNotNull(bytes);
-    }
-
-    @Override
-    public InputStream openStream() throws IOException {
-      return new ByteArrayInputStream(bytes);
-    }
-
-    @Override
-    public long size() throws IOException {
-      return bytes.length;
-    }
-
-    @Override
-    public byte[] read() throws IOException {
-      return bytes.clone();
-    }
-
-    @Override
-    public long copyTo(OutputStream output) throws IOException {
-      output.write(bytes);
-      return bytes.length;
-    }
-
-    @Override
-    public HashCode hash(HashFunction hashFunction) throws IOException {
-      return hashFunction.hashBytes(bytes);
-    }
-
-    // TODO(user): Possibly override slice()
-
-    @Override
-    public String toString() {
-      return "ByteStreams.asByteSource(" + BaseEncoding.base16().encode(bytes) + ")";
-    }
+    return ByteSource.wrap(b);
   }
 
   /**
@@ -597,7 +559,7 @@ public final class ByteStreams {
   /**
    * Returns an {@link OutputStream} that simply discards written bytes.
    *
-   * @since 14.0 (since 1.0 as net.tribe7.common.io.NullOutputStream)
+   * @since 14.0 (since 1.0 as com.google.common.io.NullOutputStream)
    */
   public static OutputStream nullOutputStream() {
     return NULL_OUTPUT_STREAM;
@@ -610,7 +572,7 @@ public final class ByteStreams {
    * @param in the input stream to be wrapped
    * @param limit the maximum number of bytes to be read
    * @return a length-limited {@link InputStream}
-   * @since 14.0 (since 1.0 as net.tribe7.common.io.LimitInputStream)
+   * @since 14.0 (since 1.0 as com.google.common.io.LimitInputStream)
    */
   public static InputStream limit(InputStream in, long limit) {
     return new LimitedInputStream(in, limit);
@@ -815,39 +777,6 @@ public final class ByteStreams {
   }
 
   /**
-   * Computes and returns the checksum value for a supplied input stream.
-   * The checksum object is reset when this method returns successfully.
-   *
-   * @param supplier the input stream factory
-   * @param checksum the checksum object
-   * @return the result of {@link Checksum#getValue} after updating the
-   *     checksum object with all of the bytes in the stream
-   * @throws IOException if an I/O error occurs
-   * @deprecated Use {@code hash} with the {@code Hashing.crc32()} or
-   *     {@code Hashing.adler32()} hash functions instead. This method is
-   *     scheduled to be removed in Guava 15.0.
-   */
-  @Deprecated
-  public static long getChecksum(
-      InputSupplier<? extends InputStream> supplier, final Checksum checksum)
-      throws IOException {
-    checkNotNull(checksum);
-    return readBytes(supplier, new ByteProcessor<Long>() {
-      @Override
-      public boolean processBytes(byte[] buf, int off, int len) {
-        checksum.update(buf, off, len);
-        return true;
-      }
-      @Override
-      public Long getResult() {
-        long result = checksum.getValue();
-        checksum.reset();
-        return result;
-      }
-    });
-  }
-
-  /**
    * Computes the hash code of the data supplied by {@code supplier} using {@code
    * hashFunction}.
    *
@@ -941,14 +870,18 @@ public final class ByteStreams {
   public static InputSupplier<InputStream> join(
       final Iterable<? extends InputSupplier<? extends InputStream>> suppliers) {
     checkNotNull(suppliers);
-    return new InputSupplier<InputStream>() {
-      @Override public InputStream getInput() throws IOException {
-        return new MultiInputStream(suppliers.iterator());
-      }
-    };
+    Iterable<ByteSource> sources = Iterables.transform(suppliers,
+        new Function<InputSupplier<? extends InputStream>, ByteSource>() {
+          @Override
+          public ByteSource apply(InputSupplier<? extends InputStream> input) {
+            return asByteSource(input);
+          }
+        });
+    return asInputSupplier(ByteSource.concat(sources));
   }
 
   /** Varargs form of {@link #join(Iterable)}. */
+  @SuppressWarnings("unchecked") // suppress "possible heap pollution" warning in JDK7
   public static InputSupplier<InputStream> join(
       InputSupplier<? extends InputStream>... suppliers) {
     return join(Arrays.asList(suppliers));
@@ -956,31 +889,16 @@ public final class ByteStreams {
 
   // TODO(user): Remove these once Input/OutputSupplier methods are removed
 
-  static <S extends InputStream> InputSupplier<S> asInputSupplier(
-      final ByteSource source) {
-    checkNotNull(source);
-    return new InputSupplier<S>() {
-      @SuppressWarnings("unchecked") // used internally where known to be safe
-      @Override
-      public S getInput() throws IOException {
-        return (S) source.openStream();
-      }
-    };
-  }
-
-  static <S extends OutputStream> OutputSupplier<S> asOutputSupplier(
-      final ByteSink sink) {
-    checkNotNull(sink);
-    return new OutputSupplier<S>() {
-      @SuppressWarnings("unchecked") // used internally where known to be safe
-      @Override
-      public S getOutput() throws IOException {
-        return (S) sink.openStream();
-      }
-    };
-  }
-
-  static ByteSource asByteSource(
+  /**
+   * Returns a view of the given {@code InputStream} supplier as a
+   * {@code ByteSource}.
+   *
+   * <p>This method is a temporary method provided for easing migration from
+   * suppliers to sources and sinks.
+   *
+   * @since 15.0
+   */
+  public static ByteSource asByteSource(
       final InputSupplier<? extends InputStream> supplier) {
     checkNotNull(supplier);
     return new ByteSource() {
@@ -988,10 +906,24 @@ public final class ByteStreams {
       public InputStream openStream() throws IOException {
         return supplier.getInput();
       }
+
+      @Override
+      public String toString() {
+        return "ByteStreams.asByteSource(" + supplier + ")";
+      }
     };
   }
 
-  static ByteSink asByteSink(
+  /**
+   * Returns a view of the given {@code OutputStream} supplier as a
+   * {@code ByteSink}.
+   *
+   * <p>This method is a temporary method provided for easing migration from
+   * suppliers to sources and sinks.
+   *
+   * @since 15.0
+   */
+  public static ByteSink asByteSink(
       final OutputSupplier<? extends OutputStream> supplier) {
     checkNotNull(supplier);
     return new ByteSink() {
@@ -999,6 +931,23 @@ public final class ByteStreams {
       public OutputStream openStream() throws IOException {
         return supplier.getOutput();
       }
+
+      @Override
+      public String toString() {
+        return "ByteStreams.asByteSink(" + supplier + ")";
+      }
     };
+  }
+
+  @SuppressWarnings("unchecked") // used internally where known to be safe
+  static <S extends InputStream> InputSupplier<S> asInputSupplier(
+      final ByteSource source) {
+    return (InputSupplier) checkNotNull(source);
+  }
+
+  @SuppressWarnings("unchecked") // used internally where known to be safe
+  static <S extends OutputStream> OutputSupplier<S> asOutputSupplier(
+      final ByteSink sink) {
+    return (OutputSupplier) checkNotNull(sink);
   }
 }

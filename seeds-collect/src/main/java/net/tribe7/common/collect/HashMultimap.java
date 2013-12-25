@@ -16,11 +16,6 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.annotations.VisibleForTesting;
-import net.tribe7.common.base.Preconditions;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,6 +23,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.base.Preconditions;
 
 /**
  * Implementation of {@link Multimap} using hash tables.

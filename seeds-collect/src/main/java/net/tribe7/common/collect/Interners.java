@@ -16,13 +16,13 @@ package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
+import java.util.concurrent.ConcurrentMap;
+
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.GwtIncompatible;
 import net.tribe7.common.base.Equivalence;
 import net.tribe7.common.base.Function;
 import net.tribe7.common.collect.MapMakerInternalMap.ReferenceEntry;
-
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Contains static methods pertaining to instances of {@link Interner}.

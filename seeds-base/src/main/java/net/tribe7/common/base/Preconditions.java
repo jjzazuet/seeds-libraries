@@ -16,26 +16,27 @@
 
 package net.tribe7.common.base;
 
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.VisibleForTesting;
-
 import java.util.NoSuchElementException;
 
 import javax.annotation.Nullable;
 
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.VisibleForTesting;
+
 /**
  * Simple static methods to be called at the start of your own methods to verify
  * correct arguments and state. This allows constructs such as
- * <pre>
- *     if (count <= 0) {
- *       throw new IllegalArgumentException("must be positive: " + count);
- *     }</pre>
  *
- * to be replaced with the more compact
- * <pre>
- *     checkArgument(count > 0, "must be positive: %s", count);</pre>
+ * <pre>   {@code
+ *   if (count <= 0) {
+ *     throw new IllegalArgumentException("must be positive: " + count);
+ *   }}</pre>
  *
- * Note that the sense of the expression is inverted; with {@code Preconditions}
+ * <p>to be replaced with the more compact
+ * <pre>   {@code
+ *   checkArgument(count > 0, "must be positive: %s", count);}</pre>
+ *
+ * <p>Note that the sense of the expression is inverted; with {@code Preconditions}
  * you declare what you expect to be <i>true</i>, just as you do with an
  * <a href="http://java.sun.com/j2se/1.5.0/docs/guide/language/assert.html">
  * {@code assert}</a> or a JUnit {@code assertTrue} call.

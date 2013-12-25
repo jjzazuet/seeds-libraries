@@ -16,16 +16,16 @@
 
 package net.tribe7.common.collect;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Objects;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * A map which forwards all its method calls to another map. Subclasses should
@@ -195,11 +195,8 @@ public abstract class ForwardingMap<K, V> extends ForwardingObject
   @Beta
   protected class StandardKeySet extends Maps.KeySet<K, V> {
     /** Constructor for use by subclasses. */
-    public StandardKeySet() {}
-
-    @Override
-    Map<K, V> map() {
-      return ForwardingMap.this;
+    public StandardKeySet() {
+      super(ForwardingMap.this);
     }
   }
 
@@ -228,11 +225,8 @@ public abstract class ForwardingMap<K, V> extends ForwardingObject
   @Beta
   protected class StandardValues extends Maps.Values<K, V> {
     /** Constructor for use by subclasses. */
-    public StandardValues() {}
-
-    @Override
-    Map<K, V> map() {
-      return ForwardingMap.this;
+    public StandardValues() {
+      super(ForwardingMap.this);
     }
   }
 

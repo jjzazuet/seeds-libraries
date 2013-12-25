@@ -46,7 +46,7 @@ import java.nio.charset.Charset;
  * @since 14.0
  * @author Colin Decker
  */
-public abstract class CharSink {
+public abstract class CharSink implements OutputSupplier<Writer> {
 
   /**
    * Opens a new {@link Writer} for writing to this sink. This method should return a new,
@@ -59,14 +59,33 @@ public abstract class CharSink {
   public abstract Writer openStream() throws IOException;
 
   /**
-   * Opens a new {@link BufferedWriter} for writing to this sink. This method should return a new,
-   * independent writer each time it is called.
+   * This method is a temporary method provided for easing migration from suppliers to sources and
+   * sinks.
+   *
+   * @since 15.0
+   * @deprecated This method is only provided for temporary compatibility with the
+   *     {@link OutputSupplier} interface and should not be called directly. Use
+   *     {@link #openStream} instead.
+   */
+  @Override
+  @Deprecated
+  public final Writer getOutput() throws IOException {
+    return openStream();
+  }
+
+  /**
+   * Opens a new buffered {@link Writer} for writing to this sink. The returned stream is not
+   * required to be a {@link BufferedWriter} in order to allow implementations to simply delegate
+   * to {@link #openStream()} when the stream returned by that method does not benefit from
+   * additional buffering. This method should return a new, independent writer each time it is
+   * called.
    *
    * <p>The caller is responsible for ensuring that the returned writer is closed.
    *
    * @throws IOException if an I/O error occurs in the process of opening the writer
+   * @since 15.0 (in 14.0 with return type {@link BufferedWriter})
    */
-  public BufferedWriter openBufferedStream() throws IOException {
+  public Writer openBufferedStream() throws IOException {
     Writer writer = openStream();
     return (writer instanceof BufferedWriter)
         ? (BufferedWriter) writer
@@ -85,6 +104,7 @@ public abstract class CharSink {
     try {
       Writer out = closer.register(openStream());
       out.append(charSequence);
+      out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
     } catch (Throwable e) {
       throw closer.rethrow(e);
     } finally {
@@ -116,10 +136,11 @@ public abstract class CharSink {
 
     Closer closer = Closer.create();
     try {
-      BufferedWriter out = closer.register(openBufferedStream());
+      Writer out = closer.register(openBufferedStream());
       for (CharSequence line : lines) {
         out.append(line).append(lineSeparator);
       }
+      out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
     } catch (Throwable e) {
       throw closer.rethrow(e);
     } finally {
@@ -140,7 +161,9 @@ public abstract class CharSink {
     Closer closer = Closer.create();
     try {
       Writer out = closer.register(openStream());
-      return CharStreams.copy(readable, out);
+      long written = CharStreams.copy(readable, out);
+      out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
+      return written;
     } catch (Throwable e) {
       throw closer.rethrow(e);
     } finally {

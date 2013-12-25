@@ -16,13 +16,6 @@
 
 package net.tribe7.common.net;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Objects;
-import net.tribe7.common.base.Preconditions;
-import net.tribe7.common.hash.Hashing;
-import net.tribe7.common.io.ByteStreams;
-import net.tribe7.common.primitives.Ints;
-
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -31,6 +24,13 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.base.Objects;
+import net.tribe7.common.base.Preconditions;
+import net.tribe7.common.hash.Hashing;
+import net.tribe7.common.io.ByteStreams;
+import net.tribe7.common.primitives.Ints;
 
 /**
  * Static utility methods pertaining to {@link InetAddress} instances.

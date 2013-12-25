@@ -16,24 +16,24 @@
 
 package net.tribe7.common.math;
 
+import static java.math.RoundingMode.CEILING;
+import static java.math.RoundingMode.FLOOR;
+import static java.math.RoundingMode.HALF_EVEN;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.math.MathPreconditions.checkNonNegative;
 import static net.tribe7.common.math.MathPreconditions.checkPositive;
 import static net.tribe7.common.math.MathPreconditions.checkRoundingUnnecessary;
-import static java.math.RoundingMode.CEILING;
-import static java.math.RoundingMode.FLOOR;
-import static java.math.RoundingMode.HALF_EVEN;
-
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.annotations.GwtIncompatible;
-import net.tribe7.common.annotations.VisibleForTesting;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.annotations.GwtIncompatible;
+import net.tribe7.common.annotations.VisibleForTesting;
 
 /**
  * A class for arithmetic on values of type {@code BigInteger}.
@@ -291,7 +291,7 @@ public final class BigIntegerMath {
    *         is not an integer multiple of {@code b}
    */
   @GwtIncompatible("TODO")
-  public static BigInteger divide(BigInteger p, BigInteger q, RoundingMode mode){
+  public static BigInteger divide(BigInteger p, BigInteger q, RoundingMode mode) {
     BigDecimal pDec = new BigDecimal(p);
     BigDecimal qDec = new BigDecimal(q);
     return pDec.divide(qDec, 0, mode).toBigIntegerExact();

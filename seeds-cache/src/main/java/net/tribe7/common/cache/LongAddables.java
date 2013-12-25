@@ -16,10 +16,10 @@
 
 package net.tribe7.common.cache;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import net.tribe7.common.annotations.GwtCompatible;
 import net.tribe7.common.base.Supplier;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Source of {@link LongAddable} objects that deals with GWT, Unsafe, and all

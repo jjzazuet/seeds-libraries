@@ -18,13 +18,13 @@ package net.tribe7.common.cache;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.annotations.GwtCompatible;
-import net.tribe7.common.base.Objects;
-
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
+import net.tribe7.common.annotations.GwtCompatible;
+import net.tribe7.common.base.Objects;
 
 /**
  * A notification of the removal of a single entry. The key and/or value may be null if they were
@@ -73,7 +73,7 @@ public final class RemovalNotification<K, V> implements Entry<K, V> {
     return value;
   }
 
-  @Override public final V setValue(V value){
+  @Override public final V setValue(V value) {
     throw new UnsupportedOperationException();
   }
 

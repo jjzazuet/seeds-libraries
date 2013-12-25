@@ -16,13 +16,13 @@
 
 package net.tribe7.common.io;
 
-import net.tribe7.common.annotations.Beta;
-
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.annotation.Nullable;
+
+import net.tribe7.common.annotations.Beta;
 
 /**
  * An OutputStream that counts the number of bytes written.
