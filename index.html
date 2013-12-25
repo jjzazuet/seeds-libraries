@@ -38,7 +38,7 @@
 <p><em>Not the whole guava ;)</em></p>
 </blockquote>
 
-<p>Atomic jars for <a href="https://code.google.com/p/guava-libraries/wiki/Release14">guava-libraries 14.0.1</a>. </p>
+<p>Atomic jars for <a href="https://code.google.com/p/guava-libraries/wiki/Release15">guava-libraries 15.0</a>. </p>
 
 <blockquote>
 <p>DISCLAIMER: With the exception of package naming, no source files were altered, just reshuffled into atomic source trees corresponding to each major library component. Also, no fruits were harmed in the making of these libraries ;).</p>
@@ -65,35 +65,38 @@
 <h2>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>Release 14.0.1 is now on Maven Central. Use an artifact like so:</p>
+<p>Release 15.0 is now on Maven Central. Use an artifact like so:</p>
 
 <pre><code>&lt;dependency&gt;
     &lt;groupId&gt;net.tribe7.seeds&lt;/groupId&gt;
     &lt;artifactId&gt;seeds-eventbus&lt;/artifactId&gt;
-    &lt;version&gt;14.0.1&lt;/version&gt;
+    &lt;version&gt;15.0&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
 <p>The following artifacts are available.</p>
 
-<pre><code>seeds-base
-seeds-cache
-seeds-collect
-seeds-eventbus
+<pre><code>seeds-base 
 seeds-functional
-seeds-hash
-seeds-io
-seeds-math
-seeds-net
+seeds-escape
 seeds-primitives
+seeds-math
 seeds-reflect
 seeds-util
+seeds-collect
+seeds-cache
+seeds-hash
+seeds-eventbus
+seeds-io
+seeds-net
+seeds-html
+seeds-xml
 </code></pre>
 
 <h2>
 <a name="compiling-from-source" class="anchor" href="#compiling-from-source"><span class="octicon octicon-link"></span></a>Compiling from source.</h2>
 
-<p>Use <a href="http://gradle.org" title="Gradle 1.6">Gradle 1.6</a> to compile the source code.</p>
+<p>Use <a href="http://gradle.org" title="Gradle 1.6">Gradle 1.6+</a> to compile the source code.</p>
 
 <pre><code>gradle clean assemble
 </code></pre>
