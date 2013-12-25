@@ -3,7 +3,7 @@ seeds-libraries
 
 > *Not the whole guava ;)*
 
-Atomic jars for [guava-libraries 14.0.1](https://code.google.com/p/guava-libraries/wiki/Release14). 
+Atomic jars for [guava-libraries 15.0](https://code.google.com/p/guava-libraries/wiki/Release15). 
 
 > DISCLAIMER: With the exception of package naming, no source files were altered, just reshuffled into atomic source trees corresponding to each major library component. Also, no fruits were harmed in the making of these libraries ;).
 
@@ -25,28 +25,31 @@ Therefore, I have decided to introduce an intentional package break and leave al
 
 ## Usage
 
-Release 14.0.1 is now on Maven Central. Use an artifact like so:
+Release 15.0 is now on Maven Central. Use an artifact like so:
 
     <dependency>
         <groupId>net.tribe7.seeds</groupId>
         <artifactId>seeds-eventbus</artifactId>
-        <version>14.0.1</version>
+        <version>15.0</version>
     </dependency>
 
 The following artifacts are available.
 
-    seeds-base
-    seeds-cache
-    seeds-collect
-    seeds-eventbus
-    seeds-functional
-    seeds-hash
-    seeds-io
-    seeds-math
-    seeds-net
-    seeds-primitives
-    seeds-reflect
-    seeds-util
+	seeds-base 
+	seeds-functional
+	seeds-escape
+	seeds-primitives
+	seeds-math
+	seeds-reflect
+	seeds-util
+	seeds-collect
+	seeds-cache
+	seeds-hash
+	seeds-eventbus
+	seeds-io
+	seeds-net
+	seeds-html
+	seeds-xml
 
 ## Compiling from source.
 
