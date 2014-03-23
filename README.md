@@ -25,12 +25,12 @@ Therefore, I have decided to introduce an intentional package break and leave al
 
 ## Usage
 
-Release 15.0 is now on Maven Central. Use an artifact like so:
+Release 16.0.1 is now on Maven Central. Use an artifact like so:
 
     <dependency>
         <groupId>net.tribe7.seeds</groupId>
         <artifactId>seeds-eventbus</artifactId>
-        <version>15.0</version>
+        <version>16.0.1</version>
     </dependency>
 
 The following artifacts are available.
