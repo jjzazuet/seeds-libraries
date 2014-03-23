@@ -16,6 +16,8 @@
 
 package net.tribe7.common.io;
 
+import static net.tribe7.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
@@ -23,7 +25,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import net.tribe7.common.annotations.Beta;
-import net.tribe7.common.base.Preconditions;
 
 /**
  * A class for reading lines of text. Provides the same functionality
@@ -52,8 +53,7 @@ public final class LineReader {
    * {@code Readable} object.
    */
   public LineReader(Readable readable) {
-    Preconditions.checkNotNull(readable);
-    this.readable = readable;
+    this.readable = checkNotNull(readable);
     this.reader = (readable instanceof Reader) ? (Reader) readable : null;
   }
 

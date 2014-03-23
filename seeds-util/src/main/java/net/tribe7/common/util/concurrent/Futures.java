@@ -30,6 +30,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -51,6 +52,7 @@ import net.tribe7.common.collect.ImmutableCollection;
 import net.tribe7.common.collect.ImmutableList;
 import net.tribe7.common.collect.Lists;
 import net.tribe7.common.collect.Ordering;
+import net.tribe7.common.collect.Sets;
 
 /**
  * Static utility methods pertaining to the {@link Future} interface.
@@ -786,9 +788,19 @@ public final class Futures {
    * Once the passed-in {@code ListenableFuture} is complete, it calls the
    * passed-in {@code Function} to generate the result.
    *
-   * <p>If the function throws any checked exceptions, they should be wrapped
-   * in a {@code UndeclaredThrowableException} so that this class can get
-   * access to the cause.
+   * <p>For historical reasons, this class has a special case in its exception
+   * handling: If the given {@code AsyncFunction} throws an {@code
+   * UndeclaredThrowableException}, {@code ChainingListenableFuture} unwraps it
+   * and uses its <i>cause</i> as the output future's exception, rather than
+   * using the {@code UndeclaredThrowableException} itself as it would for other
+   * exception types. The reason for this is that {@code Futures.transform} used
+   * to require a {@code Function}, whose {@code apply} method is not allowed to
+   * throw checked exceptions. Nowadays, {@code Futures.transform} has an
+   * overload that accepts an {@code AsyncFunction}, whose {@code apply} method
+   * <i>is</i> allowed to throw checked exception. Users who wish to throw
+   * checked exceptions should use that overload instead, and <a
+   * href="http://code.google.com/p/guava-libraries/issues/detail?id=1548">we
+   * should remove the {@code UndeclaredThrowableException} special case</a>.
    */
   private static class ChainingListenableFuture<I, O>
       extends AbstractFuture<O> implements Runnable {
@@ -1121,7 +1133,7 @@ public final class Futures {
    * Example: <pre> {@code
    * ListenableFuture<QueryResult> future = ...;
    * Executor e = ...
-   * addCallback(future, e,
+   * addCallback(future,
    *     new FutureCallback<QueryResult> {
    *       public void onSuccess(QueryResult result) {
    *         storeInCache(result);
@@ -1129,7 +1141,7 @@ public final class Futures {
    *       public void onFailure(Throwable t) {
    *         reportError(t);
    *       }
-   *     });}</pre>
+   *     }, e);}</pre>
    *
    * <p>When the callback is fast and lightweight, consider {@linkplain
    * #addCallback(ListenableFuture, FutureCallback) omitting the executor} or
@@ -1464,6 +1476,8 @@ public final class Futures {
     final AtomicInteger remaining;
     FutureCombiner<V, C> combiner;
     List<Optional<V>> values;
+    final Object seenExceptionsLock = new Object();
+    Set<Throwable> seenExceptions;
 
     CombinedFuture(
         ImmutableCollection<? extends ListenableFuture<? extends V>> futures,
@@ -1540,17 +1554,27 @@ public final class Futures {
     /**
      * Fails this future with the given Throwable if {@link #allMustSucceed} is
      * true. Also, logs the throwable if it is an {@link Error} or if
-     * {@link #allMustSucceed} is {@code true} and the throwable did not cause
-     * this future to fail.
+     * {@link #allMustSucceed} is {@code true}, the throwable did not cause
+     * this future to fail, and it is the first time we've seen that particular Throwable.
      */
     private void setExceptionAndMaybeLog(Throwable throwable) {
-      boolean result = false;
+      boolean visibleFromOutputFuture = false;
+      boolean firstTimeSeeingThisException = true;
       if (allMustSucceed) {
         // As soon as the first one fails, throw the exception up.
         // The result of all other inputs is then ignored.
-        result = super.setException(throwable);
+        visibleFromOutputFuture = super.setException(throwable);
+
+        synchronized (seenExceptionsLock) {
+          if (seenExceptions == null) {
+            seenExceptions = Sets.newHashSet();
+          }
+          firstTimeSeeingThisException = seenExceptions.add(throwable);
+        }
       }
-      if (throwable instanceof Error || (allMustSucceed && !result)) {
+
+      if (throwable instanceof Error
+          || (allMustSucceed && !visibleFromOutputFuture && firstTimeSeeingThisException)) {
         logger.log(Level.SEVERE, "input future failed.", throwable);
       }
     }

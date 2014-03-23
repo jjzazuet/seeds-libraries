@@ -114,8 +114,7 @@ public final class Iterables {
    * Returns {@code true} if {@code iterable} contains any object for which {@code equals(element)}
    * is true.
    */
-  public static boolean contains(Iterable<?> iterable, @Nullable Object element)
-  {
+  public static boolean contains(Iterable<?> iterable, @Nullable Object element) {
     if (iterable instanceof Collection) {
       Collection<?> collection = (Collection<?>) iterable;
       return Collections2.safeContains(collection, element);
@@ -894,12 +893,12 @@ public final class Iterables {
   /**
    * Creates an iterable with the first {@code limitSize} elements of the given
    * iterable. If the original iterable does not contain that many elements, the
-   * returned iterator will have the same behavior as the original iterable. The
+   * returned iterable will have the same behavior as the original iterable. The
    * returned iterable's iterator supports {@code remove()} if the original
    * iterator does.
    *
    * @param iterable the iterable to limit
-   * @param limitSize the maximum number of elements in the returned iterator
+   * @param limitSize the maximum number of elements in the returned iterable
    * @throws IllegalArgumentException if {@code limitSize} is negative
    * @since 3.0
    */

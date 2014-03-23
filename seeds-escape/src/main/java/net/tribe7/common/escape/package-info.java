@@ -19,9 +19,9 @@
  * {@link net.tribe7.common.escape.Escaper}.
  *
  * <p>Additional escapers implementations are found in the applicable packages: {@link
- * net.tribe7.common.html.HtmlEscapers} in {@code com.google.common.html}, {@link
- * net.tribe7.common.xml.XmlEscapers} in {@code com.google.common.xml}, and {@link
- * net.tribe7.common.net.UrlEscapers} in {@code com.google.common.net}.
+ * net.tribe7.common.html.HtmlEscapers} in {@code net.tribe7.common.html}, {@link
+ * net.tribe7.common.xml.XmlEscapers} in {@code net.tribe7.common.xml}, and {@link
+ * net.tribe7.common.net.UrlEscapers} in {@code net.tribe7.common.net}.
  *
  * <p>This package is a part of the open-source
  * <a href="http://guava-libraries.googlecode.com">Guava libraries</a>.

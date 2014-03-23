@@ -15,6 +15,7 @@
 package net.tribe7.common.collect;
 
 import static net.tribe7.common.base.Preconditions.checkArgument;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
 import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.io.IOException;
@@ -107,7 +108,7 @@ public final class HashBiMap<K, V> extends AbstractMap<K, V> implements BiMap<K,
   }
 
   private void init(int expectedSize) {
-    checkArgument(expectedSize >= 0, "expectedSize must be >= 0 but was %s", expectedSize);
+    checkNonnegative(expectedSize, "expectedSize");
     int tableSize = Hashing.closedTableSize(expectedSize, LOAD_FACTOR);
     this.hashTableKToV = createTable(tableSize);
     this.hashTableVToK = createTable(tableSize);

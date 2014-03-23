@@ -50,7 +50,7 @@ import net.tribe7.common.annotations.Beta;
  *
  * @author Jesse Wilson
  * @author Luke Sandberg
- * @since 9.0 (in 1.0 as {@code com.google.common.base.Service})
+ * @since 9.0 (in 1.0 as {@code net.tribe7.common.base.Service})
  */
 @Beta
 public interface Service {
@@ -70,7 +70,8 @@ public interface Service {
    *         {@link State#FAILED}. If it has already finished starting, {@link ListenableFuture#get}
    *         returns immediately. Cancelling this future has no effect on the service.
    */
-  @Deprecated ListenableFuture<State> start();
+  @Deprecated
+  ListenableFuture<State> start();
 
   /**
    * Initiates service startup (if necessary), returning once the service has finished starting.
@@ -82,7 +83,8 @@ public interface Service {
    * @throws UncheckedExecutionException if startup failed
    * @return the state of the service when startup finished.
    */
-  @Deprecated State startAndWait();
+  @Deprecated
+  State startAndWait();
 
   /**
    * If the service state is {@link State#NEW}, this initiates service startup and returns
@@ -122,7 +124,8 @@ public interface Service {
    *         {@link ListenableFuture#get} returns immediately. Cancelling this future has no effect
    *         on the service.
    */
-  @Deprecated ListenableFuture<State> stop();
+  @Deprecated
+  ListenableFuture<State> stop();
 
   /**
    * Initiates service shutdown (if necessary), returning once the service has finished stopping. If
@@ -135,7 +138,8 @@ public interface Service {
    * @throws UncheckedExecutionException if the service has failed or fails during shutdown
    * @return the state of the service when shutdown finished.
    */
-  @Deprecated State stopAndWait();
+  @Deprecated
+  State stopAndWait();
 
   /**
    * If the service is {@linkplain State#STARTING starting} or {@linkplain State#RUNNING running},
@@ -238,7 +242,7 @@ public interface Service {
    * {@code A.compareTo(B} < 0} then there is <b>not</b> guaranteed to be a valid state transition
    * {@code A -> B}.
    *
-   * @since 9.0 (in 1.0 as {@code com.google.common.base.Service.State})
+   * @since 9.0 (in 1.0 as {@code net.tribe7.common.base.Service.State})
    */
   @Beta // should come out of Beta when Service does
   enum State {

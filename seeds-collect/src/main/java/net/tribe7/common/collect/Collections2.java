@@ -21,6 +21,7 @@ import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static net.tribe7.common.base.Predicates.and;
 import static net.tribe7.common.base.Predicates.in;
 import static net.tribe7.common.base.Predicates.not;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
 import static net.tribe7.common.math.LongMath.binomial;
 
 import java.util.AbstractCollection;
@@ -308,7 +309,7 @@ public final class Collections2 {
    * Returns best-effort-sized StringBuilder based on the given collection size.
    */
   static StringBuilder newStringBuilderForCollection(int size) {
-    checkArgument(size >= 0, "size must be non-negative");
+    checkNonnegative(size, "size");
     return new StringBuilder((int) Math.min(size * 8L, Ints.MAX_POWER_OF_TWO));
   }
 

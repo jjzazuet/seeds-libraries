@@ -16,7 +16,7 @@
 
 package net.tribe7.common.collect;
 
-import static net.tribe7.common.base.Preconditions.checkArgument;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -86,7 +86,7 @@ public class HashBasedTable<R, C, V> extends StandardTable<R, C, V> {
    */
   public static <R, C, V> HashBasedTable<R, C, V> create(
       int expectedRows, int expectedCellsPerRow) {
-    checkArgument(expectedCellsPerRow >= 0);
+    checkNonnegative(expectedCellsPerRow, "expectedCellsPerRow");
     Map<R, Map<C, V>> backingMap =
         Maps.newHashMapWithExpectedSize(expectedRows);
     return new HashBasedTable<R, C, V>(

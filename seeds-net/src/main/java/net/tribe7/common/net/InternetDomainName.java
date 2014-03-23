@@ -31,6 +31,7 @@ import net.tribe7.common.base.CharMatcher;
 import net.tribe7.common.base.Joiner;
 import net.tribe7.common.base.Splitter;
 import net.tribe7.common.collect.ImmutableList;
+import net.tribe7.thirdparty.publicsuffix.PublicSuffixPatterns;
 
 /**
  * An immutable well-formed internet domain name, such as {@code com} or {@code
@@ -58,7 +59,7 @@ import net.tribe7.common.collect.ImmutableList;
  * <li>Unicode dot separators other than the ASCII period ({@code '.'}) are
  * converted to the ASCII period.
  * </ol>
- * <p>The normalized values will be returned from {@link #name()} and
+ * <p>The normalized values will be returned from {@link #toString()} and
  * {@link #parts()}, and will be reflected in the result of
  * {@link #equals(Object)}.
  *
@@ -169,14 +170,14 @@ public final class InternetDomainName {
     for (int i = 0; i < partsSize; i++) {
       String ancestorName = DOT_JOINER.join(parts.subList(i, partsSize));
 
-      if (TldPatterns.EXACT.contains(ancestorName)) {
+      if (PublicSuffixPatterns.EXACT.containsKey(ancestorName)) {
         return i;
       }
 
       // Excluded domains (e.g. !nhs.uk) use the next highest
       // domain as the effective public suffix (e.g. uk).
 
-      if (TldPatterns.EXCLUDED.contains(ancestorName)) {
+      if (PublicSuffixPatterns.EXCLUDED.containsKey(ancestorName)) {
         return i + 1;
       }
 
@@ -186,20 +187,6 @@ public final class InternetDomainName {
     }
 
     return NO_PUBLIC_SUFFIX_FOUND;
-  }
-
-  /**
-   * A deprecated synonym for {@link #from(String)}.
-   *
-   * @param domain A domain name (not IP address)
-   * @throws IllegalArgumentException if {@code name} is not syntactically valid
-   *     according to {@link #isValid}
-   * @since 8.0 (previously named {@code from})
-   * @deprecated Use {@link #from(String)}
-   */
-  @Deprecated
-  public static InternetDomainName fromLenient(String domain) {
-    return from(domain);
   }
 
   /**
@@ -309,16 +296,6 @@ public final class InternetDomainName {
     }
 
     return true;
-  }
-
-  /**
-   * A deprecated synonym for {@link #toString()}.
-   *
-   * @deprecated Use {@link #toString()}
-   */
-  @Deprecated
-  public String name() {
-    return toString();
   }
 
   /**
@@ -531,7 +508,7 @@ public final class InternetDomainName {
    */
   private static boolean matchesWildcardPublicSuffix(String domain) {
     final String[] pieces = domain.split(DOT_REGEX, 2);
-    return pieces.length == 2 && TldPatterns.UNDER.contains(pieces[1]);
+    return pieces.length == 2 && PublicSuffixPatterns.UNDER.containsKey(pieces[1]);
   }
 
   /**

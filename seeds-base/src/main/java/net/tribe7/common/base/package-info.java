@@ -42,6 +42,7 @@
  * <li>{@link net.tribe7.common.base.Predicate},
  *     {@link net.tribe7.common.base.Predicates}
  * <li>{@link net.tribe7.common.base.Equivalence}
+ * <li>{@link net.tribe7.common.base.Converter}
  * <li>{@link net.tribe7.common.base.Supplier},
  *     {@link net.tribe7.common.base.Suppliers}
  * </ul>

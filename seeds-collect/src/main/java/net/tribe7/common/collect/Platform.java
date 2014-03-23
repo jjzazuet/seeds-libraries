@@ -36,7 +36,7 @@ import net.tribe7.common.collect.Maps.EntryTransformer;
  * @author Hayward Chan
  */
 @GwtCompatible(emulated = true)
-class Platform {
+final class Platform {
   /**
    * Returns a new array of the given length with the same type as a reference
    * array.

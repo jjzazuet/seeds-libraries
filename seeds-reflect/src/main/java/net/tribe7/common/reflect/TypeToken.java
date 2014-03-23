@@ -37,6 +37,7 @@ import javax.annotation.Nullable;
 
 import net.tribe7.common.annotations.Beta;
 import net.tribe7.common.annotations.VisibleForTesting;
+import net.tribe7.common.base.Joiner;
 import net.tribe7.common.base.Predicate;
 import net.tribe7.common.collect.FluentIterable;
 import net.tribe7.common.collect.ForwardingSet;
@@ -212,7 +213,9 @@ public abstract class TypeToken<T> extends TypeCapture<T> implements Serializabl
    */
   public final <X> TypeToken<T> where(TypeParameter<X> typeParam, TypeToken<X> typeArg) {
     TypeResolver resolver = new TypeResolver()
-        .where(ImmutableMap.of(typeParam.typeVariable, typeArg.runtimeType));
+        .where(ImmutableMap.of(
+            new TypeResolver.TypeVariableKey(typeParam.typeVariable),
+            typeArg.runtimeType));
     // If there's any type error, we'd report now rather than later.
     return new SimpleTypeToken<T>(resolver.resolveType(runtimeType));
   }
@@ -504,6 +507,9 @@ public abstract class TypeToken<T> extends TypeCapture<T> implements Serializabl
       @Override public TypeToken<T> getOwnerType() {
         return TypeToken.this;
       }
+      @Override public String toString() {
+        return getOwnerType() + "." + super.toString();
+      }
     };
   }
 
@@ -527,6 +533,9 @@ public abstract class TypeToken<T> extends TypeCapture<T> implements Serializabl
       }
       @Override public TypeToken<T> getOwnerType() {
         return TypeToken.this;
+      }
+      @Override public String toString() {
+        return getOwnerType() + "(" + Joiner.on(", ").join(getGenericParameterTypes()) + ")";
       }
     };
   }

@@ -16,8 +16,8 @@
 
 package net.tribe7.common.collect;
 
-import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
 import static net.tribe7.common.collect.CollectPreconditions.checkRemove;
 
 import java.io.IOException;
@@ -1600,7 +1600,7 @@ public final class Multimaps {
     }
 
     @Override public int remove(@Nullable Object element, int occurrences) {
-      checkArgument(occurrences >= 0);
+      checkNonnegative(occurrences, "occurrences");
       if (occurrences == 0) {
         return count(element);
       }

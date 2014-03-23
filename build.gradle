@@ -7,7 +7,7 @@ subprojects {
 	apply plugin: 'eclipse'
 
 	group = 'net.tribe7.seeds'
-	version = '15.0'
+	version = '16.0.1'
 	sourceCompatibility = 1.6
 
 	def releaseBuild = true

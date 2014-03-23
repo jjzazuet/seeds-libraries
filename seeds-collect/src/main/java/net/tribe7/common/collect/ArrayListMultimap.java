@@ -16,7 +16,7 @@
 
 package net.tribe7.common.collect;
 
-import static net.tribe7.common.base.Preconditions.checkArgument;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -110,7 +110,7 @@ public final class ArrayListMultimap<K, V> extends AbstractListMultimap<K, V> {
 
   private ArrayListMultimap(int expectedKeys, int expectedValuesPerKey) {
     super(Maps.<K, Collection<V>>newHashMapWithExpectedSize(expectedKeys));
-    checkArgument(expectedValuesPerKey >= 0);
+    checkNonnegative(expectedValuesPerKey, "expectedValuesPerKey");
     this.expectedValuesPerKey = expectedValuesPerKey;
   }
 

@@ -3,7 +3,7 @@ seeds-libraries
 
 > *Not the whole guava ;)*
 
-Atomic jars for [guava-libraries 15.0](https://code.google.com/p/guava-libraries/wiki/Release15). 
+Atomic jars for [guava-libraries 16.0.1](https://code.google.com/p/guava-libraries/wiki/Release16). 
 
 > DISCLAIMER: With the exception of package naming, no source files were altered, just reshuffled into atomic source trees corresponding to each major library component. Also, no fruits were harmed in the making of these libraries ;).
 

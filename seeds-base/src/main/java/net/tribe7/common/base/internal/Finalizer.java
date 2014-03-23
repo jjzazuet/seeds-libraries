@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 /**
  * Thread that finalizes referents. All references should implement
- * {@code com.google.common.base.FinalizableReference}.
+ * {@code net.tribe7.common.base.FinalizableReference}.
  *
  * <p>While this class is public, we consider it to be *internal* and not part
  * of our published API. It is public so we can access it reflectively across
@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * loader. For example, dynamically reloading a web application or unloading
  * an OSGi bundle.
  *
- * <p>{@code com.google.common.base.FinalizableReferenceQueue} loads this class
+ * <p>{@code net.tribe7.common.base.FinalizableReferenceQueue} loads this class
  * in its own class loader. That way, this class doesn't prevent the main
  * class loader from getting garbage collected, and this class can detect when
  * the main class loader has been garbage collected and stop itself.
@@ -53,7 +53,7 @@ public class Finalizer implements Runnable {
 
   /** Name of FinalizableReference.class. */
   private static final String FINALIZABLE_REFERENCE
-      = "com.google.common.base.FinalizableReference";
+      = "net.tribe7.common.base.FinalizableReference";
 
   /**
    * Starts the Finalizer thread. FinalizableReferenceQueue calls this method

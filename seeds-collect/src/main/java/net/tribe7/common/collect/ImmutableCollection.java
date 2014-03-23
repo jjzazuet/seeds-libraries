@@ -16,8 +16,8 @@
 
 package net.tribe7.common.collect;
 
-import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.collect.CollectPreconditions.checkNonnegative;
 import static net.tribe7.common.collect.ObjectArrays.checkElementsNotNull;
 
 import java.io.Serializable;
@@ -318,7 +318,7 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E>
     int size;
     
     ArrayBasedBuilder(int initialCapacity) {
-      checkArgument(initialCapacity >= 0, "capacity must be >= 0 but was %s", initialCapacity);
+      checkNonnegative(initialCapacity, "initialCapacity");
       this.contents = new Object[initialCapacity];
       this.size = 0;
     }

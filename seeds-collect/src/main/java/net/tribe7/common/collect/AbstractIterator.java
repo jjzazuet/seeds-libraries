@@ -59,7 +59,7 @@ import net.tribe7.common.annotations.GwtCompatible;
  * @since 2.0 (imported from Google Collections Library)
  */
 // When making changes to this class, please also update the copy at
-// com.google.common.base.AbstractIterator
+// net.tribe7.common.base.AbstractIterator
 @GwtCompatible
 public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
   private State state = State.NOT_READY;
@@ -154,7 +154,9 @@ public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
       throw new NoSuchElementException();
     }
     state = State.NOT_READY;
-    return next;
+    T result = next;
+    next = null;
+    return result;
   }
 
   /**
