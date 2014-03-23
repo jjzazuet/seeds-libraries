@@ -35,21 +35,23 @@ Release 15.0 is now on Maven Central. Use an artifact like so:
 
 The following artifacts are available.
 
-	seeds-base 
-	seeds-functional
-	seeds-escape
-	seeds-primitives
-	seeds-math
-	seeds-reflect
-	seeds-util
-	seeds-collect
+	seeds-base
 	seeds-cache
-	seeds-hash
+	seeds-collect
+	seeds-escape
 	seeds-eventbus
-	seeds-io
-	seeds-net
+	seeds-functional
+	seeds-hash
 	seeds-html
+	seeds-io
+	seeds-math
+	seeds-net
+	seeds-primitives
+	seeds-reflect
+	seeds-strings
+	seeds-util
 	seeds-xml
+
 
 ## Compiling from source.
 
